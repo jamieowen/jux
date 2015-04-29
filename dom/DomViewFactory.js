@@ -18,13 +18,7 @@ DomViewFactory.prototype = {
             case 'Container' :
                 return new DomContainer( element );
 
-            case 'Sprite' :
-                return null;
-
-            case 'Image' :
-                return null;
-
-            case 'Graphic' :
+            case 'HtmlContainer' :
                 return null;
 
             default:
