@@ -2,8 +2,10 @@
   "name": "jux",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "",
+  "files":[ "src" ],
   "directories": {
+    "lib": "src",
     "test": "tests"
   },
   "scripts": {
