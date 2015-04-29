@@ -4,10 +4,10 @@ var ElementContainer = require( '../base/ElementContainer' );
 
 // Functions.
 var extend           = require( '../base/extend' );
-var jsxConstructor   = require( './jsxConstructor' );
-var jsxMergeParse    = require( './jsxMergeParse' );
-var jsxParseSize     = require( './jsxParseSize' );
-var jsxParsePosition = require( './jsxParsePosition' );
+var jsxConstructor   = require( '../jsx/jsxConstructor' );
+var jsxMergeParse    = require( '../jsx/jsxMergeParse' );
+var jsxParseSize     = require( '../jsx/jsxParseSize' );
+var jsxParsePosition = require( '../jsx/jsxParsePosition' );
 
 
 // Constructor

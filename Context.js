@@ -1,13 +1,13 @@
 
 
-var Invalidation     = require( './../../.././Invalidation' );
-var Signal           = require( './../../.././Signal' );
+var Invalidation     = require( './managers/Invalidation' );
+var Signal           = require( './core/Signal' );
 
 // Classes.
-var Element          = require( './../../.././Element' );
+var Element          = require( './base/Element' );
 
 // Functions.
-var initialiseRecursive = require( './../../.././initialiseRecursive' );
+var initialiseRecursive = require( './base/initialiseRecursive' );
 
 
 /**

@@ -1,6 +1,6 @@
 
-var Prop3   = require( '././Prop3' );
-var Signal  = require( '././Signal');
+var Prop3   = require( '../core/Prop3' );
+var Signal  = require( '../core/Signal');
 
 var generateUID = require( './generateUID' );
 
