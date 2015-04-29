@@ -4,78 +4,71 @@ var Element             = require( './Element' );
 
 // Functions.
 var initialiseRecursive = require( './initialiseRecursive' );
-var extend              = require( './extend' );
 
 // Constructor
-var ElementContainer = function() {
+var ElementContainer = function(){
 
     Element.call( this );
-
     this.children = [];
 };
 
 
+ElementContainer.prototype = Object.create(Element.prototype);
+ElementContainer.prototype.constructor = ElementContainer;
 module.exports = ElementContainer;
 
 
-ElementContainer.prototype = extend( Element, {
+ElementContainer.prototype.add = function( child ){
 
-    constructor: ElementContainer,
+    if (!child || this.children.indexOf(child) > -1)
+        return;
 
-    add: function( child ){
+    if (child.parent)
+        child.parent.remove(child);
 
-        if (!child || this.children.indexOf(child) > -1)
-            return;
+    this.children.push(child);
 
-        if (child.parent)
-            child.parent.remove(child);
+    child.__parent = this;
 
-        this.children.push(child);
-
-        child.__parent = this;
-
-        if(this.__context) {
-            initialiseRecursive(this.__context, child);
-            this.__view.add( child );
-        }
-
-        child.signals.added.dispatch(child.__parent);
-
-        return child;
-    },
-
-
-    remove: function( child ) {
-
-        var index = this.children.indexOf( child );
-        return this.removeAt( index );
-    },
-
-
-    removeAt: function( index ) {
-
-        var child = this.children[ index ];
-        var p = child.__parent;
-        child.__parent = null;
-
-        this.children.splice( index, index+1 );
-
-        child.signals.removed.dispatch( p );
-
-        return child;
-    },
-
-
-    removeAllChildren: function() {
-
-        while( this.children.length ){
-            this.removeAt( 0 );
-        }
-
-        return null;
+    if(this.__context) {
+        initialiseRecursive(this.__context, child, ElementContainer );
     }
-    
-} );
+
+    child.signals.added.dispatch(child.__parent);
+
+    return child;
+};
+
+
+ElementContainer.prototype.remove = function( child ){
+
+    var index = this.children.indexOf( child );
+    return this.removeAt( index );
+};
+
+
+ElementContainer.prototype.removeAt = function( index ){
+
+    var child = this.children[ index ];
+    var p = child.__parent;
+    child.__parent = null;
+
+    this.children.splice( index, index+1 );
+
+    child.signals.removed.dispatch( p );
+
+    return child;
+};
+
+
+ElementContainer.prototype.removeAllChildren = function(){
+
+    while( this.children.length ){
+        this.removeAt( 0 );
+    }
+
+    return null;
+};
 
 
 

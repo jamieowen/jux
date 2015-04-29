@@ -1,8 +1,6 @@
 
-var ElementContainer = require( './ElementContainer' );
 
-
-var initialiseRecursive = function( context, element ){
+var initialiseRecursive = function( context, element, ElementContainer ){
 
     if( !element.__inited && context ){
 
@@ -19,7 +17,7 @@ var initialiseRecursive = function( context, element ){
         if( element instanceof ElementContainer ){
 
             for( var i = 0; i<element.children.length; i++ ){
-                initialiseRecursive( context, element.children[ i ] );
+                initialiseRecursive( context, element.children[ i ], ElementContainer );
             }
         }
     }

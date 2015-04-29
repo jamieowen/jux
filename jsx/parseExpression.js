@@ -21,7 +21,7 @@ var parseExpression = function( value ) {
         var operand = parseFloat( match[4] );
 
         if( percent === '%' && ( operator !== '-' && isNaN(operand) ) ){
-            console.log( "PARSE EXPRESSION : percent only ", match );
+
             num *= 0.01;
             return { expression: true, value: function( expArg ){
                 return num * expArg;
@@ -29,13 +29,11 @@ var parseExpression = function( value ) {
         }else
         if( percent === '%' && operator === '-' && !isNaN(operand) ){
 
-            console.log( "PARSE EXPRESSION : and subtraction ", match );
             num *= 0.01;
             return { expression: true, value: function( expArg ){
                 return ( num * expArg ) - operand;
             } };
         }else{
-            console.log( "PARSE EXPRESSION : none ", match );
 
             return { expression: false, value: num };
         }

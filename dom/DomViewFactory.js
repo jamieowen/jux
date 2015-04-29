@@ -57,7 +57,13 @@ var DomContainer = function( element ){
     this.element.signals.updated.add( this.onUpdated, this );
 
     this.uidClass = '_' + this.element.uid;
-    this.domElement = document.createElement( 'div' );
+
+    if( element.domElement ){ // TODO : Look into the process of this.
+        this.domElement = element.domElement;
+    }else{
+        this.domElement = document.createElement( 'div' );
+    }
+
     this.domElement.className = 'container ' + this.uidClass;
 };
 
@@ -78,12 +84,10 @@ DomContainer.prototype = {
     },
 
     onUpdated: function(){
-        console.log( 'UPDATED', this.element.size.width, this.element.size.height );
 
         var size = this.element.size;
         var position = this.element.position;
 
-        console.log( 'update : ', 'translate(' + position.x + ',' + position.y + ')' );
         createCssClass( '.' + this.uidClass, {
             width: size.width + 'px',
             height: size.height + 'px',

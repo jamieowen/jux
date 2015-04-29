@@ -3,12 +3,10 @@
 var ElementContainer = require( '../base/ElementContainer' );
 
 // Functions.
-var extend           = require( '../base/extend' );
 var jsxConstructor   = require( '../jsx/jsxConstructor' );
 var jsxMergeParse    = require( '../jsx/jsxMergeParse' );
 var jsxParseSize     = require( '../jsx/jsxParseSize' );
 var jsxParsePosition = require( '../jsx/jsxParsePosition' );
-
 
 // Constructor
 var Container = function(){
@@ -19,6 +17,14 @@ var Container = function(){
     this.__layoutChanged = false;
 };
 
+
+// containers by default are 100% width and height??
+
+// XLayout? String refs for basic layouts? and register strings with context for more.
+// or maybe stack?
+// built in layouts could be basics:
+// grid-xy,grid-yx,grid-xz,grid-zx, etc..
+// stack-x, stack-y, stack-z
 
 var jsxParsers = jsxMergeParse( jsxParseSize, jsxParsePosition, {
 
@@ -34,35 +40,29 @@ var jsxParsers = jsxMergeParse( jsxParseSize, jsxParsePosition, {
 
 module.exports = jsxConstructor( Container, 'Container', jsxParsers );
 
+Container.prototype = Object.create(ElementContainer.prototype);
 
-Container.prototype = extend( ElementContainer, {
+Container.prototype.constructor = Container;
+Container.prototype.viewClass   = 'Container';
 
-    viewClass: 'Container',
-    constructor: Container,
 
-    update: function( changed ){
+Container.prototype.update = function( changed ) {
 
-        // check layout..
-        if( this.__layoutChanged ){
+    // check layout..
+    if (this.__layoutChanged) {
 
-            this.__layoutChanged = false;
-            changed = true;
+        this.__layoutChanged = false;
+        changed = true;
 
-            if( this.__layout ){
-                this.__layout.apply( this );
-            }
+        if (this.__layout) {
+            this.__layout.apply(this);
         }
-
-        // then update standard position,
-        ElementContainer.prototype.update.call( this, changed );
-    },
-
-    updated: function(){
-        // clean flags.
-        this.updated.dispatch();
     }
 
-});
+    // then update standard position,
+    ElementContainer.prototype.update.call(this, changed);
+};
+
 
 Object.defineProperties( Container.prototype, {
 

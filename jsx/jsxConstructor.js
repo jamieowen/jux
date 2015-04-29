@@ -3,6 +3,8 @@ var jsxConstructor = function( cls, clsName, jsxParsers ){
 
     var construct = function( props, children ){
 
+        console.log( 'CONSTRUCT : ', props, children );
+
         var element = new cls();
         var i,child,prop;
 
