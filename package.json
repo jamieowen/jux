@@ -1,0 +1,22 @@
+{
+  "name": "jux",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jamieowen/jux.git"
+  },
+  "author": "Jamie Owen <hello@jamieowen.com> (=)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jamieowen/jux/issues"
+  },
+  "homepage": "https://github.com/jamieowen/jux"
+}
