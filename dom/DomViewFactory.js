@@ -19,15 +19,12 @@ DomViewFactory.prototype = {
                 return new DomContainer( element );
 
             case 'HtmlContainer' :
-                return null;
+                return new DomHtmlContainer( element );
 
             default:
                 throw new Error( 'No view class available for this element.' );
-
         }
-
     }
-
 };
 
 module.exports = DomViewFactory;
@@ -87,7 +84,36 @@ DomContainer.prototype = {
             height: size.height + 'px',
             transform: 'translate(' + position.x + 'px,' + position.y + 'px);'
         })
+    }
+};
 
+
+var DomHtmlContainer = function( element ){
+
+    DomContainer.call( this, element );
+
+    // listen to changes in html elements.
+    element.signals.domElementAdded.add( this.onDomAdded, this );
+    element.signals.domElementRemoved.add( this.onDomRemoved, this );
+
+    // add initial children.
+    for( var i = 0; i<element.domElements.length; i++ ){
+        this.domElement.appendChild( element.domElements[i] );
     }
 
+    // handle resize events to map back to our model
+    this.domElement.addEventListener( 'resize', function( event ){
+        console.log( 'DOM RESIZE : ', event );
+    });
 };
+
+DomHtmlContainer.prototype.onDomAdded = function( domElement ){
+    this.domElement.appendChild( domElement );
+};
+
+DomHtmlContainer.prototype.onDomRemoved = function( domElement ){
+    this.domElement.removeChild( domElement );
+};
+
+DomHtmlContainer.prototype = Object.create( DomContainer.prototype );
+

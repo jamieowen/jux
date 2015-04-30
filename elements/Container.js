@@ -38,7 +38,7 @@ var jsxParsers = jsxMergeParse( jsxParseSize, jsxParsePosition, {
     }
 });
 
-module.exports = jsxConstructor( Container, 'Container', jsxParsers );
+module.exports = jsxConstructor( Container, jsxParsers );
 
 Container.prototype = Object.create(ElementContainer.prototype);
 
@@ -59,8 +59,8 @@ Container.prototype.update = function( changed ) {
         }
     }
 
-    // then update standard position,
-    ElementContainer.prototype.update.call(this, changed);
+    ElementContainer.prototype.update.call( this, changed );
+
 };
 
 

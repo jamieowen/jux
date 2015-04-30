@@ -45,48 +45,22 @@ Element.prototype = {
     update: function( changed ){
 
         var p = this.__parent;
-        var propagate = false;
+        var propagate,prop;
 
-        if( this.position.hasChanged || changed ){
-            this.position.hasChanged = false;
-            changed = true;
-
-            if( p ){
-                this.position.update( p.size.width, p.size.height, p.size.depth );
-            }
+        if( p ) {
+            prop = p.size;
         }
 
-        if( this.size.hasChanged || changed ){
-            this.size.hasChanged = false;
-            changed = true;
-            propagate = true;
-
-            if( p ){
-                this.size.update( p.size.width, p.size.height, p.size.depth );
-            }
-        }
-
-        if( this.rotation.hasChanged ){
-            this.rotation.hasChanged = false;
-            changed = true;
-            // don't call update on rotation - this is only for percentages. TODO : may be just call anyway?
-        }
-
-        if( this.scale.hasChanged ){
-            this.scale.hasChanged = false;
-            changed = true;
-            // don't call update on scale - this is only for percentages. TODO : may be just call anyway?
-        }
+        changed = this.position.update( changed, prop );
+        changed = propagate = this.size.update( changed, prop );
+        this.rotation.update( changed );
+        this.scale.update( changed );
 
         if( changed ){
             this.signals.updated.dispatch();
         }
 
-        var child;
-        for( var i = 0; i<this.children.length; i++ ) {
-            child = this.children[i];
-            child.update( propagate );
-        }
+        return propagate;
     },
 
     invalidate: function() {

@@ -111,18 +111,29 @@ Prop3.prototype = {
     },
 
     // update percentages.
-    update: function( xExpArg, yExpArg, zExpArg ){
+    update: function( forceUpdate, parentProp3 ){
 
-        if( this.__xExp ){
-            this.__x = this.__xExp( xExpArg );
-        }
+        if( this.hasChanged || forceUpdate ){
+            this.hasChanged = false;
 
-        if( this.__yExp ){
-            this.__y = this.__yExp( yExpArg );
-        }
+            // update expression based values.
+            if( parentProp3 ){
+                if( this.__xExp ){
+                    this.__x = this.__xExp( parentProp3.x );
+                }
 
-        if( this.__zExp ){
-            this.__z = this.__zExp( zExpArg );
+                if( this.__yExp ){
+                    this.__y = this.__yExp( parentProp3.y );
+                }
+
+                if( this.__zExp ){
+                    this.__z = this.__zExp( parentProp3.z );
+                }
+            }
+            return true;
+
+        }else{
+            return false;
         }
     }
 

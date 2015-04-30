@@ -1,6 +1,7 @@
 
 // Classes.
-var ElementContainer = require( '../base/ElementContainer' );
+var Element = require( '../base/Element' );
+var Signal  = require( '../core/Signal' );
 
 // Functions.
 var jsxConstructor   = require( '../jsx/jsxConstructor' );
@@ -11,18 +12,23 @@ var jsxParsePosition = require( '../jsx/jsxParsePosition' );
 // Constructor
 var HtmlContainer = function(){
 
-    ElementContainer.call( this );
+    Element.call( this );
 
-    //this.domElement = ''
+    this.domElements = [];
+    this.signals.domElementAdded = new Signal();
+    this.signals.domElementRemoved = new Signal();
 };
 
 var jsxParsers = jsxMergeParse( jsxParseSize, jsxParsePosition, {
 });
 
-module.exports = jsxConstructor( HtmlContainer, 'HtmlContainer', jsxParsers, function( element, child ){
-    console.log( 'unhandled child', element, child );
+module.exports = jsxConstructor( HtmlContainer, jsxParsers, function( element, child ){
 
-
+    if( element instanceof HtmlContainer && child instanceof HTMLElement ){
+        element.addDomElement( child );
+    }else{
+        throw new Error( 'Error parsing jsx/html children of HtmlContainer' );
+    }
 });
 
 module.exports.create = function( elementType, props, children )
@@ -48,11 +54,28 @@ module.exports.create = function( elementType, props, children )
 };
 
 
-
-HtmlContainer.prototype = Object.create(ElementContainer.prototype);
+HtmlContainer.prototype = Object.create(Element.prototype);
 HtmlContainer.prototype.constructor = HtmlContainer;
 HtmlContainer.prototype.viewClass   = 'HtmlContainer';
 
+
+HtmlContainer.prototype.addDomElement = function( domElement ){
+
+    var idx = this.domElements.indexOf( domElement );
+    if( idx === -1 ){
+        this.domElements.push( domElement );
+        this.signals.domElementAdded.dispatch( domElement );
+    }
+};
+
+HtmlContainer.prototype.removeDomElement = function( domElement ){
+
+    var idx = this.domElements.indexOf( domElement );
+    if( idx > -1 ){
+        this.domElement.splice( idx, 1 );
+        this.signals.domElementRemoved.dispatch( domElement );
+    }
+};
 
 Object.defineProperties( HtmlContainer.prototype, {
 

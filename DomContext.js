@@ -24,6 +24,8 @@ var DomContext = function(){
 
     this.__context = this; // TODO : look at this?
 
+    this.isContext = true;
+
     initialiseRecursive(this.__context, this, ElementContainer );
 
 };

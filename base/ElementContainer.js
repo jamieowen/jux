@@ -18,6 +18,20 @@ ElementContainer.prototype.constructor = ElementContainer;
 module.exports = ElementContainer;
 
 
+ElementContainer.prototype.update = function( changed ){
+
+    var propagate = Element.prototype.update.call( this, changed );
+
+    var child;
+    for( var i = 0; i<this.children.length; i++ ) {
+        child = this.children[i];
+        child.update( propagate );
+    }
+
+    return propagate;
+};
+
+
 ElementContainer.prototype.add = function( child ){
 
     if (!child || this.children.indexOf(child) > -1)

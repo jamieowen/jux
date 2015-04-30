@@ -1,17 +1,19 @@
 
 var Element = require( '../base/Element' );
+var ElementContainer = require( '../base/ElementContainer' );
 
-var jsxConstructor = function( cls, clsName, jsxParsers, unhandledChild ){
+//
+
+var jsxConstructor = function( cls, jsxParsers, unhandledChild ){
 
     // TODO : clsName probably not needed..
 
     var construct = function( props, children ){
 
-        console.log( 'CONSTRUCT : ',arguments );
-
         var element = new cls();
         var i,child,prop;
 
+        console.log( 'CONSTRUCT : ', props, children, cls instanceof Function );
         var parse;
         for( prop in props ){
 
@@ -25,29 +27,25 @@ var jsxConstructor = function( cls, clsName, jsxParsers, unhandledChild ){
 
         }
 
-        // add children
-
-        if( element.add && children ){
+        // handle children.
+        if( children && children.length ){
 
             for( i = 0; i<children.length; i++ ){
-
                 child = children[i];
-                if( child instanceof Element ){
+                if( child instanceof Element && element instanceof ElementContainer ){
                     element.add( child );
                 }else
-                if( unhandledChild ){ // html handling.
+                if( unhandledChild ){ // this can happen when html elements are used.
+
                     if( child instanceof Array ){
-                        console.log( 'ARRAY' );
                         for( var j = 0; j<child.length; j++ ){
                             unhandledChild( element, child[j] );
                         }
                     }else{
-                        console.log( [] instanceof Array, 'standard child' );
                         unhandledChild( element, child );
                     }
-
                 }else{
-                    throw new Error( 'Unhandled child in jsx parsing.' );
+                    throw new Error( 'Unhandled child or element in jsx parsing.' );
                 }
             }
         }
