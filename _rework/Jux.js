@@ -1,23 +1,12 @@
 
-var JuxNode = function(){
+var JuxNode = require( './JuxNode' );
 
-    this.type       = '';
-    this.parent     = null;
-    this.children   = [];
-    this.owner      = null; // the node where this was defined in jsx
+
+var JuxDomNode = function(){
+    JuxNode.call( this );
 };
 
-
-JuxNode.prototype = {
-
-    update: function(){
-
-    },
-
-    etc: function(){
-
-    }
-};
+JuxDomNode.prototype = Object.create( JuxNode.prototype );
 
 var Jux = {
 
@@ -25,9 +14,20 @@ var Jux = {
         // html elements.
         console.log( 'createElement :', arguments );
 
-        var node = new JuxNode();
-        node.type = elementType;
+        // Lookup Node
+        //var node = new JuxNode();
+        //node.type = elementType;
 
+        return this.createNode( JuxDomNode, elementType, props, children );
+    },
+
+    createNode: function( nodeClass, nodeType, props, children ) {
+
+
+        var node = new nodeClass();
+        node.type = nodeType;
+
+        //console.log( 'createNode', node );
         if( children && children.length ){
             for( var i = 0; i<children.length; i++ ){
                 node.children.push( children[i] );
@@ -39,7 +39,9 @@ var Jux = {
 
     createComponent: function( classOrPrototype ) {
 
-        var construct = null;
+        var construct;
+        var name = classOrPrototype.viewClass == undefined ? 'Unknown' : classOrPrototype.viewClass;
+
         if (classOrPrototype instanceof Function) {
             construct = classOrPrototype;
         } else {
@@ -47,26 +49,20 @@ var Jux = {
             construct = function () {
                 JuxNode.call(this);
             };
+
             construct.prototype = Object.create(JuxNode.prototype);
+
             for (var key in classOrPrototype) {
                 construct.prototype[key] = classOrPrototype[key];
             }
         }
 
         // TODO : Throw an error ?
-        var name = construct.prototype.viewClass == undefined ? 'Unknown' : construct.prototype.viewClass;
+
         var Jux = this;
 
         var createComponent = function(props, children) {
-            console.log(this);
-
-            var node = Jux.createElement(name, props, children);
-
-            // TODO : Traverse this node downwards.
-            // call build if needed, and attach the new nodes to the node tree.
-            // i think???
-
-            return node;
+            return Jux.createNode( construct, name, props, children );
         }.bind(this);
 
         return createComponent;
@@ -74,17 +70,19 @@ var Jux = {
 };
 
 
-var JuxExport = Jux.createComponent({
+var JuxAppNode = function(){
+    JuxNode.call(this);
+};
+JuxAppNode.prototype = Object.create( JuxNode.prototype );
 
-    viewClass: 'Jux',
-    build: function(){
-        // would have to return constructed nodes, not as jsx. ( as this is a .js file )
-    }
+var JuxExport = Jux.createComponent( JuxAppNode );
 
-});
-
-JuxExport.createComponent   = Jux.createComponent;
-JuxExport.createElement     = Jux.createElement;
+for( var key in Jux ){
+    JuxExport[ key ] = Jux[ key ];
+}
+//JuxExport.createComponent   = Jux.createComponent;
+//JuxExport.createElement     = Jux.createElement;
+//JuxExport.createNode        = Jux.createNode;
 //JuxExport.setFactory        =
 
 module.exports = JuxExport;
