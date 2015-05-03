@@ -1,12 +1,8 @@
 
 var JuxNode = require( './JuxNode' );
+var JuxDomNode = require( './JuxDomNode' );
+var JuxContextNode = require( './JuxContextNode' );
 
-
-var JuxDomNode = function(){
-    JuxNode.call( this );
-};
-
-JuxDomNode.prototype = Object.create( JuxNode.prototype );
 
 var Jux = {
 
@@ -69,17 +65,12 @@ var Jux = {
     }
 };
 
-
-var JuxAppNode = function(){
-    JuxNode.call(this);
-};
-JuxAppNode.prototype = Object.create( JuxNode.prototype );
-
-var JuxExport = Jux.createComponent( JuxAppNode );
+var JuxExport = Jux.createComponent( JuxContextNode );
 
 for( var key in Jux ){
     JuxExport[ key ] = Jux[ key ];
 }
+
 //JuxExport.createComponent   = Jux.createComponent;
 //JuxExport.createElement     = Jux.createElement;
 //JuxExport.createNode        = Jux.createNode;

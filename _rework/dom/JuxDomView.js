@@ -14,7 +14,7 @@ DomView.prototype = {
     },
 
     removeFromParent: function(){
-        parent.actualView.removeChild( this.actialView );
+        parent.actualView.removeChild( this.actualView );
     },
 
     render: function(){

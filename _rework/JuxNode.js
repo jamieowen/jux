@@ -15,12 +15,6 @@ var JuxNode = function(){
 
 JuxNode.prototype = {
 
-    tick: function(){
-
-        this.__build();
-        this.__update();
-    },
-
     __build: function(){
 
         if( this.needsBuild ){
