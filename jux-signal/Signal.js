@@ -2,7 +2,6 @@
 var Signal = function()
 {
     this.listeners = null;
-    this.scopes    = null;
 };
 
 module.exports = Signal;
