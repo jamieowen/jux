@@ -1,13 +1,13 @@
 {
-  "name": "jux-pointer",
+  "name": "jux-dom",
   "version": "1.0.0",
-  "description": "",
-  "main": "Pointer.js",
+  "description": "Defines the proxy objects used to support dom interaction with jux.",
+  "main": "DomFactory.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "jux-signal": "^1.0.0"
+    "jux-attribute": "^1.0.0"
   },
   "author": "Jamie Owen <hello@jamieowen.com> (=)",
   "license": "ISC"

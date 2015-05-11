@@ -1,13 +1,10 @@
 {
-  "name": "jux-pointer",
+  "name": "jux-core",
   "version": "1.0.0",
-  "description": "",
-  "main": "Pointer.js",
+  "description": "Centralises the factory register and later - things like jsx object creation.",
+  "main": "Jux.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "jux-signal": "^1.0.0"
   },
   "author": "Jamie Owen <hello@jamieowen.com> (=)",
   "license": "ISC"

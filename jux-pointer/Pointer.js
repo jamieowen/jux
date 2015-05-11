@@ -13,6 +13,7 @@ var Pointer = function( element ) {
     this.dragOffset = [ 0, 0 ];
     this.dragStart  = [ 0, 0 ];
 
+    // (todo) interaction events need to be abstracted to the proxy.
     this.element.addEventListener( 'mousemove', this.onPointer.bind(this) );
     this.element.addEventListener( 'mouseup', this.onPointer.bind(this) );
     this.element.addEventListener( 'mousedown', this.onPointer.bind(this) );
