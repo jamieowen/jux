@@ -37,6 +37,38 @@ Element.prototype = {
         }
     },
 
+    getBounds: function( inner )
+    {
+        var bounds = {
+            top:0, left: 0, bottom: 0, right: 0, width: 0, height: 0
+        };
+
+        if( inner && this.__children ){
+            var childBounds;
+            for( var i = 0; i<this.children.length; i++ ){
+
+                childBounds = this.children[0].getBounds();
+
+                bounds.left = Math.min( bounds.left, childBounds.left );
+                bounds.top = Math.min( bounds.top, childBounds.top );
+                bounds.right = Math.max( bounds.right, childBounds.right );
+                bounds.bottom = Math.max( bounds.bottom, childBounds.bottom );
+            }
+            bounds.width = bounds.right - bounds.left;
+            bounds.height = bounds.bottom - bounds.top;
+
+        }else{
+            bounds.left = this.position.x;
+            bounds.top  = this.position.y;
+            bounds.right = bounds.left + this.size.width;
+            bounds.bottom = bounds.top + this.size.height;
+            bounds.width = bounds.size.width;
+            bounds.height = bounds.size.height;
+        }
+
+        return bounds;
+    },
+
     // Sync children with the
     __proxyChildren: function(){
 
