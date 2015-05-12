@@ -47,14 +47,13 @@ DomFactory.prototype = {
 
     proxy: function( element ){
 
-        console.log( 'WEAK MAP SORT : PROXY : ', element );
-        var cached = null;//this.elementMap[ element ];
+        var cached = this.elementMap.get( element );
 
         if( cached ){
             return cached;
         }else{
             cached = new DomElementProxy( element );
-            this.elementMap[ element ] = cached;
+            this.elementMap.set( element, cached );
             return cached;
         }
     },
@@ -70,7 +69,7 @@ DomFactory.prototype = {
 var DomElementProxy = function( domElement ){
 
     this.view = domElement;
-    //this.view.style.position = 'absolute';
+    this.view.style.position = 'absolute';
 
     this.view.addEventListener( 'resize', function( event ){
         console.log( 'DOM RESIZE : ', this.view.getBoundingClientRect() );
@@ -93,7 +92,6 @@ DomElementProxy.prototype = {
         this.size.__x = bounds.right - bounds.left;
         this.size.__y = bounds.bottom - bounds.top;
 
-        console.log( 'TODO : LAYOUT NOW - SET DOM ELEMENT SIZE : ', this.size );
     },
 
     update: function(){

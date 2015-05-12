@@ -16,6 +16,7 @@ var Element = function( target ) {
     }else{
         console.log( 'Proxy should notify a resize event.' );
     }
+
     // notify children change.
     //this.proxy.onChildrenChange = null
 };
@@ -25,6 +26,8 @@ module.exports = Element;
 
 
 Element.prototype = {
+
+    constructor: Element,
 
     update: function(){
 
@@ -43,17 +46,22 @@ Element.prototype = {
             top:0, left: 0, bottom: 0, right: 0, width: 0, height: 0
         };
 
-        if( inner && this.__children ){
-            var childBounds;
-            for( var i = 0; i<this.children.length; i++ ){
+        if( inner ){
 
-                childBounds = this.children[0].getBounds();
+            var children = this.children;
+            var childBounds;
+
+            for( var i = 0; i<children.length; i++ ){
+
+                childBounds = children[i].getBounds();
 
                 bounds.left = Math.min( bounds.left, childBounds.left );
                 bounds.top = Math.min( bounds.top, childBounds.top );
                 bounds.right = Math.max( bounds.right, childBounds.right );
                 bounds.bottom = Math.max( bounds.bottom, childBounds.bottom );
+
             }
+
             bounds.width = bounds.right - bounds.left;
             bounds.height = bounds.bottom - bounds.top;
 
@@ -62,8 +70,8 @@ Element.prototype = {
             bounds.top  = this.position.y;
             bounds.right = bounds.left + this.size.width;
             bounds.bottom = bounds.top + this.size.height;
-            bounds.width = bounds.size.width;
-            bounds.height = bounds.size.height;
+            bounds.width = this.size.width;
+            bounds.height = this.size.height;
         }
 
         return bounds;
