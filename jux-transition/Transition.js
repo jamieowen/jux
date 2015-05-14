@@ -1,5 +1,6 @@
 
 var Tweenr = require( 'tweenr' );
+var mapInnerObjects = require( './mapInnerObjects' );
 
 // transition the children in the supplied container.
 
@@ -49,39 +50,11 @@ Transition.prototype = {
         }
 
         console.log( 'SORT FOR TWEEN : In View :', childrenInView.length, ' Not In View:', childrenNotInView.length );
-        // map an objects nested values so property object values can use:
-        // obj.position.x, obj.size.width, etc.
-
-        var mapProps = function( propObj, childObj, rec ){
-
-            var props = {};
-            var result = [];
-
-            console.log( 'TEST :', rec );
-            for( var key in propObj ){
-
-                if( typeof propObj[key] === 'object' ){
-
-                    // test for existence of property object on child.
-                    try{
-                        childObj = childObj[key];
-                    }catch(error){
-                        throw new Error( 'No property "' + key + '" of type object found on child. ' );
-                    }
-
-                    result = result.concat( mapProps( propObj[key], childObj, rec++ ) );
-
-                }else{
-                    props[ key ] = propObj[ key ];
-                }
-            }
-
-            return result.concat( [ childObj, props ] );
-        };
 
         var child,childObj,tweenProps,prop,i,j,key;
         var mapped,cEase,cDuration,cDelay;
 
+        var exclude = ['ease','delay','duration'];
         // in view children.
         for( i = 0; i<childrenInView.length; i++ ){
 
@@ -95,7 +68,7 @@ Transition.prototype = {
             cEase = tweenProps.ease === undefined ? ease : tweenProps.ease;
 
             // returns [ obj,props, obj,props, etc ]
-            mapped = mapProps(tweenProps, child, 0);
+            mapped = mapInnerObjects(tweenProps,child,exclude);
 
             for (j = 0; j<mapped.length; j+=2) {
 
@@ -106,8 +79,10 @@ Transition.prototype = {
                 tweenProps.delay    = cDelay;
                 tweenProps.ease     = cEase;
 
-                console.log( 'TWEEN :', childObj, tweenProps );
-                this.engine.to( childObj, tweenProps ).on( 'complete', function(){
+                this.engine.to( childObj, tweenProps ).on('update', function( t ){
+                    //t.target.x = t._options.x;
+
+                }.bind(this)).on( 'complete', function(){
                     console.log( 'complete : call back' );
                 } );
             }
@@ -123,14 +98,16 @@ Transition.prototype = {
                 tweenProps = {};
                 childTo(child, i, tweenProps, false);
 
-                mapped = mapProps(tweenProps,child,0);
+                mapped = mapInnerObjects(tweenProps,child,exclude);
 
                 for(j = 0; j<mapped.length; j+=2) {
 
                     childObj   = mapped[j];
                     tweenProps = mapped[j+1];
 
-                    console.log( 'SET DIRECT :', childObj, tweenProps );
+                    delete tweenProps.delay;
+                    delete tweenProps.duration;
+                    delete tweenProps.ease;
 
                     for( key in tweenProps ){
                         childObj[key] = tweenProps[key];
