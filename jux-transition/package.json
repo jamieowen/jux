@@ -10,6 +10,7 @@
   "author": "Jamie Owen <hello@jamieowen.com> (=)",
   "license": "ISC",
   "devDependencies": {
-    "tape": "^4.0.0"
+    "tape": "^4.0.0",
+    "tween-chain": "^1.0.0"
   }
 }

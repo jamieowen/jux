@@ -1,5 +1,7 @@
 
 var Tweenr = require( 'tweenr' );
+var TweenChain = require( 'tween-chain' );
+
 var mapInnerObjects = require( './mapInnerObjects' );
 
 // transition the children in the supplied container.
@@ -30,7 +32,7 @@ Transition.prototype = {
      * @param ease The default easing equation.
      * @param inView Perform two iterations; one with tweens on children in view, and one without tweens out of view.
      */
-    tween: function( childTo, duration, delay, ease, inView ){
+    tween: function( childTo, duration, delay, ease, inView, callBack ){
 
         if( !this.container.__children ){
             return;
@@ -49,12 +51,13 @@ Transition.prototype = {
             childrenInView = this.container.getVisibleChildren();
         }
 
-        console.log( 'SORT FOR TWEEN : In View :', childrenInView.length, ' Not In View:', childrenNotInView.length );
-
-        var child,childObj,tweenProps,prop,i,j,key;
+        var child,childObj,tweenProps,i,j,key;
         var mapped,cEase,cDuration,cDelay;
 
         var exclude = ['ease','delay','duration'];
+
+        var tweenChain = TweenChain();
+
         // in view children.
         for( i = 0; i<childrenInView.length; i++ ){
 
@@ -79,14 +82,16 @@ Transition.prototype = {
                 tweenProps.delay    = cDelay;
                 tweenProps.ease     = cEase;
 
-                this.engine.to( childObj, tweenProps ).on('update', function( t ){
-                    //t.target.x = t._options.x;
-
-                }.bind(this)).on( 'complete', function(){
-                    console.log( 'complete : call back' );
-                } );
+                tweenChain.chain( childObj, tweenProps );
             }
         }
+
+        this.engine.to( tweenChain ).on( 'complete', function(){
+
+            if( callBack ){
+                callBack();
+            }
+        });
 
         // not in view - set properties immediately.
         if( childrenNotInView ){

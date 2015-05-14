@@ -4,8 +4,6 @@ var Attribute = require( 'jux-attribute' );
 var DomFactory = function(){
 
     this.elementMap = new WeakMap();
-
-    //window.addEventListener( 'resize', ... )
 };
 
 
@@ -65,32 +63,22 @@ DomFactory.prototype = {
 
 
 // Standard handler.
-
 var DomElementProxy = function( domElement ){
 
     this.view = domElement;
-    this.view.style.position = 'absolute';
-
-    this.view.addEventListener( 'resize', function( event ){
-        console.log( 'DOM RESIZE : ', this.view.getBoundingClientRect() );
-    }, true);
-
-    this.view.onresize = function(){
-        console.log( 'dom resize' );
-    };
-
-    this.__calculateViewSize();
-
+    this.calculateViewSize();
 };
 
 DomElementProxy.prototype = {
 
-    __calculateViewSize: function(){
+    calculateViewSize: function(){
 
         var bounds = this.view.getBoundingClientRect();
 
         this.size.__x = bounds.right - bounds.left;
         this.size.__y = bounds.bottom - bounds.top;
+
+        this.size.changed.dispatch();
 
     },
 

@@ -8,8 +8,12 @@ This forces the require statement to discover the top level jux-core require sta
 
 ## todo - unit tests!
 
+## todo - possibly use event emitter instead of signals
+
 ## Overview & Goals
 
-- A set of UI tools to...
+
+- Provide an abstraction to build UI code to interact with popular rendering engines ( DOM, PIXI, THREE, etc ) using the same code.
+-
 
 

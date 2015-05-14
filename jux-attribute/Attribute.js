@@ -1,4 +1,5 @@
 
+var Signal = require( 'jux-signal' );
 
 var Attribute = function(){
 
@@ -6,8 +7,11 @@ var Attribute = function(){
     this.__y = 0;
     this.__z = 0;
 
+    // if this attribute has been modified internally.
+    // ( not from the view. e.g dom element )
     this.modified = false;
 
+    this.changed = new Signal();
 };
 
 
@@ -21,6 +25,9 @@ var properties = {
             return this.__x;
         },
         set: function( value ){
+            if( value === this.__x ){
+                return;
+            }
             this.modified = true;
             this.__x = value;
         }
@@ -31,6 +38,9 @@ var properties = {
             return this.__y;
         },
         set: function( value ){
+            if( value === this.__y ){
+                return;
+            }
             this.modified = true;
             this.__y = value;
         }
@@ -41,6 +51,9 @@ var properties = {
             return this.__z;
         },
         set: function( value ){
+            if( value === this.__z ){
+                return;
+            }
             this.modified = true;
             this.__z = value;
         }

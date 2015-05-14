@@ -10,15 +10,6 @@ var Element = function( target ) {
         //this.proxy = Jux.create( this.type );
     }
 
-    // be notified of resize of this element.
-    if( this.proxy.onResize ){
-        this.proxy.onResize = this.__proxyResized.bind(this);
-    }else{
-        console.log( 'Proxy should notify a resize event.' );
-    }
-
-    // notify children change.
-    //this.proxy.onChildrenChange = null
 };
 
 
@@ -77,6 +68,21 @@ Element.prototype = {
         return bounds;
     },
 
+    recalculateProxyViewSizes: function( recursive ){
+
+        if( recursive === undefined ){
+            recursive = true;
+        }
+
+        this.proxy.calculateViewSize();
+
+        if( recursive && this.__children ){
+            for( var i = 0; i<this.__children.length; i++ ){
+                this.__children[i].recalculateProxyViewSizes( recursive );
+            }
+        }
+    },
+
     // Sync children with the
     __proxyChildren: function(){
 
@@ -87,15 +93,15 @@ Element.prototype = {
     },
 
     __proxyChildAdded: function(){
-        // should not really happen ?? = should use this Element to add children ?
+        // MAY SCRAP THIS...
     },
 
     __proxyChildRemoved: function(){
-        // should not really happen ?? - should use this Element to remove children ?
+        // MAY SCRAP THIS...
     },
 
     __proxyResized: function(){
-        return; // notify ?
+        // MAY SCRAP THIS...
     }
 };
 
