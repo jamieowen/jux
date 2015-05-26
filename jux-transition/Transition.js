@@ -122,5 +122,109 @@ Transition.prototype = {
 
         }
 
+    },
+
+    // tween( container, positionFunc, )
+    // args
+    // split into two functions.
+    // positionChild - ( child, idx, tweenProps
+    //
+    // timeChild - ( visIdx,
+
+    // childIdx ( the index in the container )
+    // viewIdx
+
+    // container.getBounds().contains( child.getBounds() );
+
+    // tween( container, childTo,
+
+    // inOut - indicate if the transition is an 'in' transition or 'out' transition
+    // - if in, the end positions are calculated first and then checked if they are in view.
+    //   if
+
+    // STANDARD TWEEN ( all children regardless )
+    // childTo( child, childIdx, tweenProps )
+
+    tweenStandard: function( container, tweenOpts, childTo ){
+
+        var children = container.__children;
+
+        if( !children || !tweenOpts || !childTo ){
+            return;
+        }
+
+        tweenOpts.duration = tweenOpts.duration === undefined ? 0 : tweenOpts.duration;
+        tweenOpts.ease = tweenOpts.ease === undefined ? 'easeInCubic' : tweenOpts.ease;
+        tweenOpts.delay = tweenOpts.delay === undefined ? 0 : tweenOpts.delay;
+
+        var i,j;
+        var child,mapped,tweenProps,cEase,cDuration,cDelay;
+        var ignore = ['ease','delay','duration'];
+
+        var tweenChain = TweenChain();
+
+        for( i = 0; i<children.length; i++ ){
+
+            child = children[i];
+
+            tweenProps = {};
+            childTo( child, i, tweenProps );
+
+            cDuration = tweenProps.duration === undefined ? tweenOpts.duration : tweenProps.duration;
+            cDelay = tweenProps.delay === undefined ? tweenOpts.delay : tweenProps.delay;
+            cEase = tweenProps.ease === undefined ? tweenOpts.ease : tweenProps.ease;
+
+            mapped = mapInnerObjects( tweenProps, child, ignore );
+
+            for( j = 0; j<mapped.length; j+=2 ){
+
+                child   = mapped[j];
+                tweenProps = mapped[j+1];
+
+                tweenProps.duration = cDuration;
+                tweenProps.delay    = cDelay;
+                tweenProps.ease     = cEase;
+
+                tweenChain.chain( child, tweenProps );
+            }
+
+        }
+
+        return this.engine.to( tweenChain );
+    },
+
+
+    // childVisible( container, child, childIdx )
+    // childTo( child, visIdx, tweenProps )
+    tweenVisible: function( container, tweenOpts, childVisible, childTo )
+    {
+        var children = container.__children;
+
+        if( !children || !tweenOpts || !childTo || !childVisible ){
+            return;
+        }
+
+        tweenOpts.duration = tweenOpts.duration === undefined ? 0 : tweenOpts.duration;
+        tweenOpts.ease = tweenOpts.ease === undefined ? 'easeInCubic' : tweenOpts.ease;
+        tweenOpts.delay = tweenOpts.delay === undefined ? 0 : tweenOpts.delay;
+
+        var visible = [];
+        var notVisible = [];
+        var child;
+
+        for( var i = 0; i<children.length; i++ ){
+
+            child = children[i];
+            if( childVisible( container, child, i ) ){
+                visible.push( child );
+            }else{
+                notVisible.push( child );
+            }
+        }
+
+        // fake a container for both visible and non-visible
+        this.tweenStandard( {__children:notVisible}, {delay:0,duration:0,ease:'none'}, childTo )
+        return this.tweenStandard( {__children:visible}, tweenOpts, childTo );
+
     }
 };

@@ -1,15 +1,47 @@
 
-var Jux = require( 'jux-core' );
+var Rect = function(){
 
+    this.top = 0;
+    this.right = 0;
+    this.bottom = 0;
+    this.left = 0;
+};
 
-var Element = function( target ) {
+Rect.prototype = {
 
-    if( target ){
-        this.proxy = Jux.proxy( target );
-    }else{
-        //this.proxy = Jux.create( this.type );
+    contains: function( rect ){
+        return (
+            rect.left >= this.left &&
+            rect.right <= this.right &&
+            rect.top >= this.top &&
+            rect.bottom <= this.bottom
+        );
+    }
+};
+
+Object.defineProperties( Rect.prototype, {
+    width: {
+        get: function(){
+            return this.right - this.left;
+        }
+    },
+
+    height: {
+        get: function(){
+            return this.bottom - this.top;
+        }
     }
 
+});
+
+var Element = function( proxy ) {
+
+    if( !proxy ){
+        throw new Error( 'A proxy instance needs creating.' );
+    }
+
+    this.proxy = proxy;
+    this.__children = null; // build when accessed via getter/setter
 };
 
 
@@ -33,9 +65,7 @@ Element.prototype = {
 
     getBounds: function( inner )
     {
-        var bounds = {
-            top:0, left: 0, bottom: 0, right: 0, width: 0, height: 0
-        };
+        var bounds = new Rect();
 
         if( inner ){
 
@@ -83,25 +113,10 @@ Element.prototype = {
         }
     },
 
-    // Sync children with the
-    __proxyChildren: function(){
-
-        var pChildren = this.proxy.getChildren();
-        for( var i = 0; i<pChildren.length;i++ ){
-            this.__children.push( new Element( pChildren[i] ) );
-        }
-    },
-
-    __proxyChildAdded: function(){
-        // MAY SCRAP THIS...
-    },
-
-    __proxyChildRemoved: function(){
-        // MAY SCRAP THIS...
-    },
-
-    __proxyResized: function(){
-        // MAY SCRAP THIS...
+    add: function( element )
+    {
+        // TODO : Sort out more robust event dispatching methods.
+        this.children.push( element );
     }
 };
 
@@ -134,9 +149,8 @@ Object.defineProperties( Element.prototype, {
     children: {
         get: function(){
 
-            if( this.__children === undefined ){
+            if( !this.__children ){
                 this.__children = [];
-                this.__proxyChildren();
             }
 
             return this.__children;

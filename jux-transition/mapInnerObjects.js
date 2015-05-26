@@ -2,17 +2,17 @@
 // map an objects nested values so property object values can use:
 // obj.position.x, obj.size.width, etc.
 
-var mapInnerObjects = function( object, mapTo, exclude ){
+var mapInnerObjects = function( object, mapTo, ignore ){
 
     var result = [];
     var props = {};
     var propCount = 0;
     var exists;
-    exclude = exclude === undefined ? [] : exclude;
+    ignore = ignore === undefined ? [] : ignore;
 
     for( var key in object ){
 
-        if( typeof object[key] === 'object' && exclude.indexOf( key ) === -1){
+        if( typeof object[key] === 'object' && ignore.indexOf( key ) === -1){
 
             /**try{
                 exists = mapTo[key];
@@ -20,11 +20,11 @@ var mapInnerObjects = function( object, mapTo, exclude ){
                 throw new Error( 'Object being mapped to has no property :', key );
             }**/
             if( mapTo[key] !== undefined ){
-                result = result.concat( mapInnerObjects( object[key], mapTo[key], exclude ) );
+                result = result.concat( mapInnerObjects( object[key], mapTo[key], ignore ) );
             }
 
         }else
-        if( exclude.indexOf( key ) === -1 ){
+        if( ignore.indexOf( key ) === -1 ){
             propCount++;
             props[ key ] = object[ key ];
         }

@@ -1,5 +1,6 @@
 
-var Attribute = require( 'jux-attribute' );
+var DomElementProxy = require( './DomElement' );
+
 
 var DomFactory = function(){
 
@@ -43,16 +44,30 @@ DomFactory.prototype = {
         }
     },
 
-    proxy: function( element ){
+    proxy: function( JuxClass, domElement, depth ) {
 
-        var cached = this.elementMap.get( element );
+        var cached = this.elementMap.get( domElement );
 
         if( cached ){
             return cached;
         }else{
-            cached = new DomElementProxy( element );
-            this.elementMap.set( element, cached );
-            return cached;
+
+            if( depth === undefined ){
+                depth = 1;
+            }
+
+            var proxy = new DomElementProxy( domElement );
+            var element = new JuxClass( proxy );
+
+            if( depth > 0 ){
+                var children = proxy.getChildren();
+                for( var i = 0; i<children.length; i++ ){
+                    element.add( this.proxy( JuxClass, children[i], depth-1 ) );
+                }
+            }
+
+            this.elementMap.set( domElement, element );
+            return element;
         }
     },
 
@@ -60,92 +75,3 @@ DomFactory.prototype = {
         // not used. - later
     }
 };
-
-
-// Standard handler.
-var DomElementProxy = function( domElement ){
-
-    this.view = domElement;
-    this.calculateViewSize();
-};
-
-DomElementProxy.prototype = {
-
-    calculateViewSize: function(){
-
-        var bounds = this.view.getBoundingClientRect();
-
-        this.size.__x = bounds.right - bounds.left;
-        this.size.__y = bounds.bottom - bounds.top;
-
-        this.size.changed.dispatch();
-
-    },
-
-    update: function(){
-
-        var transform = '';
-        if( this.__position ){
-            transform += 'translate(' + this.__position.x + 'px, ' + this.__position.y + 'px)';
-        }
-        if( this.__rotation ){
-            transform += ' rotate(' + this.__rotation.x + 'deg)';
-        }
-        if( this.__scale ){
-            transform += ' scale(' + this.__scale.x + ', ' + this.__scale.y + ')';
-        }
-
-        this.view.style.transform = transform;
-
-        // only adjust the view size explicitly if we have changed internally. ( i.e. not from listening to changes in the view )
-        if( this.__size && this.__size.modified ){
-            this.view.style.width  = this.__size.width;
-            this.view.style.height = this.__size.height;
-        }
-    },
-
-    getChildren: function(){
-        return this.view.childNodes;
-    }
-};
-
-Object.defineProperties( DomElementProxy.prototype, {
-
-    size: {
-        get: function(){
-            if( !this.__size ){
-                this.__size = new Attribute();
-            }
-            return this.__size;
-        }
-    },
-
-    position: {
-        get: function(){
-            if( !this.__position ){
-                this.__position = new Attribute();
-            }
-            return this.__position;
-        }
-    },
-
-    rotation: {
-        get: function(){
-            if( !this.__rotation ){
-                this.__rotation = new Attribute();
-            }
-            return this.__rotation;
-        }
-    },
-
-    scale: {
-        get: function(){
-            if( !this.__scale ){
-                this.__scale = new Attribute();
-            }
-            return this.__scale;
-        }
-    }
-
-} );
-
