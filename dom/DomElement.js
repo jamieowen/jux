@@ -1,5 +1,5 @@
 
-var Attribute       = require( 'jux-attribute' );
+var Attribute       = require( '../attribute' );
 //var EventEmitter    = require( 'events' );
 
 // Standard handler.

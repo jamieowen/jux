@@ -1,5 +1,5 @@
 
-var Signal = require( 'jux-signal' );
+var Signal = require( '../signal' );
 
 
 var Attribute = function(){
