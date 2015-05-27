@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "",
-  "files":[ "src" ],
+  "files": [
+    "src"
+  ],
   "directories": {
     "lib": "src",
     "test": "tests"
@@ -20,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/jamieowen/jux/issues"
   },
-  "homepage": "https://github.com/jamieowen/jux"
+  "homepage": "https://github.com/jamieowen/jux",
+  "devDependencies": {
+    "tape": "^4.0.0"
+  }
 }
