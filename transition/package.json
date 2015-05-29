@@ -4,7 +4,8 @@
   "description": "Create simple transition tweens on container children.",
   "main": "Transition.js",
   "scripts": {
-    "test": "node test/index.test.js"
+    "test": "node test/index.test.js",
+    "docs": "jsdoc2md -t .readme.hbs -p list *.js > README.md"
   },
   "dependencies": {},
   "author": "Jamie Owen <hello@jamieowen.com> (=)",

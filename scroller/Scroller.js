@@ -48,7 +48,9 @@ var Scroller = function( pointerEvents, wheelEvents, opts ){
 
 module.exports = Scroller;
 
-
+/**
+ * @enum
+ */
 Scroller.SCROLL = 'scroll';
 
 

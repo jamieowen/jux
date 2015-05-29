@@ -9,6 +9,11 @@ Run me..
 <a name="Scroller"></a>
 ## Scroller
 **Kind**: global class  
+
+* [Scroller](#Scroller)
+  * [new Scroller(pointerEvents, wheelEvents, opts)](#new_Scroller_new)
+  * [.SCROLL](#Scroller.SCROLL)
+
 <a name="new_Scroller_new"></a>
 ### new Scroller(pointerEvents, wheelEvents, opts)
 Scroller Class for jux.
@@ -18,6 +23,9 @@ Scroller Class for jux.
 - wheelEvents
 - opts
 
+<a name="Scroller.SCROLL"></a>
+### Scroller.SCROLL
+**Kind**: static enum property of <code>[Scroller](#Scroller)</code>  
 
 <a name="ScrollerAxis"></a>
 ## ScrollerAxis

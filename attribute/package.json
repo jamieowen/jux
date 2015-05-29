@@ -4,7 +4,8 @@
   "description": "Provides a simple display like interface to 3 values - x,y,z / width,height,depth.",
   "main": "Attribute.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "jsdoc2md -t .readme.hbs -p list *.js > README.md"
   },
   "author": "Jamie Owen <hello@jamieowen.com> (=)",
   "license": "ISC",
