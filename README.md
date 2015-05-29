@@ -1,14 +1,50 @@
 
 # jux
 
-## todo - problems with singleton usage.
+##
+Todo
+
+
+### General
+- [ ] Unit tests.
+- [ ] Emitter instead of Signals.
+
+### Element
+- [ ] Revisit sync/update sizes.
+
+### Layout
+- [ ] Add axis based iteration options.
+- [ ] Check naming of update flags.
+- [ ] Caching positions and provide optional updates for applying offsets. ( for scrolling )
+
+### Transition
+- [ ] Revisit & finalise
+- [ ] Offscreen to onscreen transitions.
+- [ ] Tweenr dependency - may be simplify but provide options to use other engine.
+
+### Scroller
+- [ ] Add WheelEvent support.
+- [ ] Overshoot easing when dragging.
+- [ ] Page / Snap support.
+- [ ] Spring physics.
+- [ ] Access to easing constants.
+
+### Factories
+- [ ] Revisit.
+
+
+##
+Roadmap
+- [ ] Decide on suitable implementation for Deferred Layouts/Indexing.
+- [ ] JSX
+
+
+
+### notes
+- Had problems with singleton usage with older Jux singleton style.
 Possibly only browserify related : (https://github.com/substack/node-browserify/issues/1063)
 Currently avoided by not specifying jux-core as a dependency in jux-element.
 This forces the require statement to discover the top level jux-core require statement in the main project.
-
-## todo - unit tests!
-
-## todo - possibly use event emitter instead of signals
 
 ## Overview & Goals
 
@@ -16,6 +52,11 @@ This forces the require statement to discover the top level jux-core require sta
 - Provide an abstraction to build UI code to interact with popular rendering engines ( DOM, PIXI, THREE, etc ) using the same code.
 -
 
+
+ERROR, Cannot find module.
+Jux
+
+Jux
 
 <a name="Element"></a>
 ## Element
