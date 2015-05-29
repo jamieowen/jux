@@ -1,6 +1,11 @@
 
 var ease = require( 'jux/physics/ease' );
 
+/**
+ * ScrollerAxis
+ *
+ * @constructor
+ */
 var ScrollerAxis = function(){
 
     this.snapSize = 0;

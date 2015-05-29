@@ -3,15 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "",
-  "files": [
-    "src"
-  ],
   "directories": {
     "lib": "src",
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "jsdoc2md -t .readme.hbs -p list */*.js > README.md"
   },
   "repository": {
     "type": "git",
@@ -24,6 +22,7 @@
   },
   "homepage": "https://github.com/jamieowen/jux",
   "devDependencies": {
+    "glob": "^5.0.10",
     "tape": "^4.0.0"
   }
 }

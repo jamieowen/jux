@@ -10,6 +10,16 @@ var defaultOpts = {
     axes: [ false, true, false ]
 };
 
+/**
+ *
+ * Scroller Class for jux.
+ *
+ * @param pointerEvents
+ * @param wheelEvents
+ * @param opts
+ * @constructor
+ *
+ */
 var Scroller = function( pointerEvents, wheelEvents, opts ){
 
     opts = opts || {};
@@ -104,6 +114,13 @@ mixes( Scroller, {
 
     },
 
+    /**
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @returns {*}
+     */
     setSnapSize: function( x, y, z ){
 
         for( var i = 0; i<this.axes.length; i++ ){
