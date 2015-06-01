@@ -52,6 +52,8 @@ module.exports = Scroller;
  * @enum
  */
 Scroller.SCROLL = 'scroll';
+Scroller.OVERSHOT_MIN = 'overshot-min';
+Scroller.OVERSHOT_MAX = 'overshot-max';
 
 
 inherit( Scroller, EventEmitter );
@@ -94,23 +96,34 @@ mixes( Scroller, {
 
     onWheelDelta: function( type, delta ){
 
-        //if( !this.pointerEvents.down ){
-        //    vec3.scale( delta, delta, -1.0 );
-        //    vec3.add( this.velocity, this.velocity, delta );
-        //}
+        for( var i = 0; i<this.axes.length; i++ ){
+            if( this.axes[i] ){
+                this.axes[i].wheelDelta( delta[i] );
+            }
+        }
     },
 
     update: function( dt ){
 
         var changed = false;
+        var axis;
 
         for( var i = 0; i<this.axes.length; i++ ){
-            if( this.axes[i] ){
-                changed = changed || this.axes[i].update(dt);
+            axis = this.axes[i];
+            if( axis ){
+                changed = changed || axis.update(dt);
+
+                if( changed && axis.overshotMin ){
+                    this.emit( Scroller.OVERSHOT_MIN, i, axis.overshotNorm );
+                }else
+                if( changed && axis.overshotMax ){
+                    this.emit( Scroller.OVERSHOT_MAX, i, axis.overshotNorm );
+                }
             }
         }
 
         if( changed ) {
+
             this.emit(Scroller.SCROLL);
         }
 
@@ -147,7 +160,7 @@ mixes( Scroller, {
         return this;
     },
 
-    setMin: function( x, y, z ){
+    setMinBounds: function( x, y, z ){
 
         for( var i = 0; i<this.axes.length; i++ ){
             if( this.axes[i] && !isNaN(arguments[i]) ){
@@ -159,12 +172,11 @@ mixes( Scroller, {
         return this;
     },
 
-    setMax: function( x, y, z ){
+    setMaxBounds: function( x, y, z ){
 
         for( var i = 0; i<this.axes.length; i++ ){
             if( this.axes[i] && !isNaN(arguments[i]) ){
                 this.axes[i].max = arguments[i];
-
             }
         }
 
@@ -177,14 +189,6 @@ mixes( Scroller, {
         }else{
             return NaN;
         }
-    },
-
-    next: function(){
-        console.log( 'next' );
-    },
-
-    previous: function(){
-        console.log( 'previous' );
     },
 
     dispose: function(){

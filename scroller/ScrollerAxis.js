@@ -1,5 +1,13 @@
 
-var ease = require( 'jux/physics/ease' );
+var pull = require( 'jux/physics/pull' );
+
+// Standard way of defining a physics based animation method.
+// wrap in a function to specify different
+
+var defaultOvershootMethod = function( begin, end, speed ){
+    var force = 3;
+    return pull( begin, end, speed, force );
+};
 
 /**
  * ScrollerAxis
@@ -22,14 +30,25 @@ var ScrollerAxis = function(){
     this.scrollShouldEnd = false;
     this.scrollStart = 0;
 
-    this.overshoot = 100;
+    this.overshoot = 0.25;
+    this.overshootMethod = defaultOvershootMethod;
+    this.overshotMin = false;
+    this.overshotMax = false;
+    this.overshotNorm = 0;
 
     this.moveAmount = 0;
     this.moveLast = 0;
 };
 
+var create = function(){
+    var axis = new ScrollerAxis();
+    return axis;
+};
 
-module.exports = ScrollerAxis;
+create.ScrollerAxis = ScrollerAxis;
+
+
+module.exports = ScrollerAxis; // leave as new() for now.
 
 
 ScrollerAxis.prototype = {
@@ -60,92 +79,115 @@ ScrollerAxis.prototype = {
     },
 
     wheelDelta: function( delta ){
+        if( !this.scroll ){
+            var contentHeight = ( this.max - this.min ) - this.viewSize;
+            var overshotMin = this.position > this.min;
+            var overshotMax = this.position < -contentHeight;
 
+            if( !overshotMin && !overshotMax ){
+
+                this.snapEase = null; // prevent
+                delta = -delta;
+                this.speed += delta * 0.03;
+            }
+
+        }
     },
 
     update: function(dt){
+        
+        if( this.scroll ){
+            var pos = this.scrollStart + this.moveAmount;
+        }else{
+            pos = this.position;
+        }
+        
+        var contentHeight = ( this.max - this.min ) - this.viewSize;
+        var overshoot = this.viewSize * this.overshoot;
+        this.overshotMin = pos > this.min;
+        this.overshotMax = pos < -contentHeight;
 
-        var overshoot = this.viewSize * 0.25;
+        if( this.overshotMin ){
+            this.overshotNorm = Math.abs( this.min - pos ) / overshoot; // 0 - 1.0, 2.5, etc
+        }else
+        if( this.overshotMax ){
+            this.overshotNorm = Math.abs( -contentHeight - pos ) / overshoot;
+        }
+
+        this.speed *= this.friction;
+
+        var maxSpeed = 20;
+        if( Math.abs(this.speed) > maxSpeed ){
+            this.speed = maxSpeed * ( this.speed / Math.abs(this.speed) );
+        }
 
         if( this.scroll ){
 
-            this.position = this.scrollStart + this.moveAmount;
+            var overshotDrag = this.overshotNorm / ( 1 / this.overshoot );
+            //console.log( this.position, this.scrollStart, this.moveLast, overshotMin, overshotMax, this.scrollShouldEnd );
+            if( this.overshotMin ){
+                this.position = this.min + ( overshoot * overshotDrag );
+            }else
+            if( this.overshotMax ){
+                this.position = -contentHeight - ( overshoot * overshotDrag );
+            }else{
+                this.position = pos;
+            }
             this.snapEase = null;
+            this.speed = 0;
 
             if( this.scrollShouldEnd ){
                 this.scroll = false;
                 this.scrollShouldEnd = false;
                 // add the 'throw' speed increase.
-                this.speed += this.moveLast; // TODO : This should compare with previous frame
+
+                if( !this.overshotMin && !this.overshotMax ) {
+                    this.speed += this.moveLast; // TODO : This should compare with previous frame
+                }
             }
 
         }else{
 
-            var pastMin = this.position > this.min;
-            var contentHeight = ( this.max - this.min ) - this.viewSize;
-            var pastMax = this.position < -contentHeight;
-
-            if( !pastMin && !pastMax ){
-                this.speed *= this.friction; // apply friction as usual.
-            }else
-            if( pastMin ){
-                var diff = Math.abs( this.min - this.position );
-                var diffNorm = 1 - Math.min( diff / overshoot, 1 );
-                this.speed *= this.friction * ( 0.9955 * diffNorm  );
-            }else
-            if( pastMax ){
-                var diff = Math.abs( -contentHeight - this.position );
-                var diffNorm = 1 - Math.min( diff / overshoot, 1 );
-                this.speed *= this.friction * ( 0.9955 * diffNorm  );
-            }
-
             this.position += this.speed;
 
+            // check if we have slowed enough to stop updating and come to a halt.
             var canRest = Math.abs(this.speed) < 0.25;
 
-            if( ( pastMin || pastMax ) && canRest && !this.snapEase ) {
+            if( ( this.overshotMin || this.overshotMax ) && !this.snapEase ) {
 
-                // check whether we are applying a snap and start to apply it.
-                console.log( 'START SNAP' );
-                this.speed = 0;
-                if( pastMin ){
-                    this.snapEase = ease( this.position, this.min, 0.1, this.speed );
+                if( this.overshotMin ){
+                    this.snapEase = this.overshootMethod( this.position, this.min, this.speed );
                 }else
-                if( pastMax ){
-                    this.snapEase = ease( this.position, -contentHeight, 0.1, this.speed );
+                if( this.overshotMax ){
+                    this.snapEase = this.overshootMethod( this.position, -contentHeight, this.speed );
                 }
 
             }else
             if( this.snapEase ){
+
+                if( this.overshotNorm ){
+                    this.snapEase.factor = this.overshotNorm;
+                }else{
+                    this.snapEase.factor = 1;
+                }
+
                 this.position = this.snapEase.update();
 
                 if( this.snapEase.done() ){
-                    console.log( 'SNAP DONE' );
+
+                    this.speed = this.snapEase.speed;
                     this.snapEase = null;
-                    return false;
+                    return true;
                 }
 
             }else
             if( canRest ){
+                this.speed = 0;
                 return false;
             }
         }
 
         return true;
-    },
-
-    __constrain: function( min, max, current, change ){
-
-        var end = current + change;
-        if( end < min ){
-            return 0;
-        }else
-        if( end > max ){
-            return 0;
-        }else{
-            return 1;
-        }
     }
-
 
 };
