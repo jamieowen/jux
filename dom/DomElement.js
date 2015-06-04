@@ -29,8 +29,11 @@ DomElementProxy.prototype = {
     update: function(){
 
         var transform = '';
+
         if( this.__position ){
             transform += 'translate(' + this.__position.x + 'px, ' + this.__position.y + 'px)';
+            //this.view.style.top = this.__position.y + 'px';
+            //this.view.style.left = this.__position.x + 'px';
         }
         if( this.__rotation ){
             transform += ' rotate(' + this.__rotation.x + 'deg)';

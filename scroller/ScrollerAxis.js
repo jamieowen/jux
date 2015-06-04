@@ -26,7 +26,7 @@ var ScrollerAxis = function(){
     this.speed = 0;
     this.friction = 0.9655;
 
-    this.scroll = false;
+    this.scrolling = false;
     this.scrollShouldEnd = false;
     this.scrollStart = 0;
 
@@ -55,31 +55,31 @@ ScrollerAxis.prototype = {
 
     start: function(){
 
-        if( !this.scroll ){
+        if( !this.scrolling ){
             this.scrollStart = this.position;
             this.moveAmount = 0;
             this.moveLast = 0;
-            this.scroll = true;
+            this.scrolling = true;
         }
     },
 
     stop: function(){
 
-        if( this.scroll ){
+        if( this.scrolling ){
             this.scrollShouldEnd = true;
         }
     },
 
     move: function( offset ){
 
-        if( this.scroll ){
+        if( this.scrolling ){
             this.moveAmount += offset;
             this.moveLast = offset;
         }
     },
 
     wheelDelta: function( delta ){
-        if( !this.scroll ){
+        if( !this.scrolling ){
             var contentHeight = ( this.max - this.min ) - this.viewSize;
             var overshotMin = this.position > this.min;
             var overshotMax = this.position < -contentHeight;
@@ -96,7 +96,7 @@ ScrollerAxis.prototype = {
 
     update: function(dt){
         
-        if( this.scroll ){
+        if( this.scrolling ){
             var pos = this.scrollStart + this.moveAmount;
         }else{
             pos = this.position;
@@ -121,7 +121,7 @@ ScrollerAxis.prototype = {
             this.speed = maxSpeed * ( this.speed / Math.abs(this.speed) );
         }
 
-        if( this.scroll ){
+        if( this.scrolling ){
 
             var overshotDrag = this.overshotNorm / ( 1 / this.overshoot );
             //console.log( this.position, this.scrollStart, this.moveLast, overshotMin, overshotMax, this.scrollShouldEnd );
@@ -137,7 +137,7 @@ ScrollerAxis.prototype = {
             this.speed = 0;
 
             if( this.scrollShouldEnd ){
-                this.scroll = false;
+                this.scrolling = false;
                 this.scrollShouldEnd = false;
                 // add the 'throw' speed increase.
 

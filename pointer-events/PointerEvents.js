@@ -32,6 +32,8 @@ PointerEvents.prototype = Object.create( EventEmitter.prototype );
 
 PointerEvents.prototype.onPointer = function( event ){
 
+    event.preventDefault();
+
     switch( event.type ){
         case 'mousemove' :
 

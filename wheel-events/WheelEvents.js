@@ -22,6 +22,8 @@ WheelEvents.prototype = Object.create( EventEmitter.prototype );
 
 WheelEvents.prototype.onMouseWheel = function(event){
 
+    event.preventDefault();
+
     this.delta[0] = isNaN( event.deltaX ) ? 0
         : event.deltaX;
 

@@ -27,6 +27,8 @@ var Scroller = function( pointerEvents, wheelEvents, opts ){
 
     EventEmitter.call( this );
 
+    this.scrolling = false;
+
     this.pointerEvents = pointerEvents;
     this.wheelEvents   = wheelEvents;
 
@@ -123,8 +125,10 @@ mixes( Scroller, {
         }
 
         if( changed ) {
-
+            this.scrolling = true;
             this.emit(Scroller.SCROLL);
+        }else{
+            this.scrolling = false;
         }
 
     },
