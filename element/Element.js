@@ -1,38 +1,5 @@
 
-var Rect = function(){
 
-    this.top = 0;
-    this.right = 0;
-    this.bottom = 0;
-    this.left = 0;
-};
-
-Rect.prototype = {
-
-    contains: function( rect ){
-        return (
-            rect.left >= this.left &&
-            rect.right <= this.right &&
-            rect.top >= this.top &&
-            rect.bottom <= this.bottom
-        );
-    }
-};
-
-Object.defineProperties( Rect.prototype, {
-    width: {
-        get: function(){
-            return this.right - this.left;
-        }
-    },
-
-    height: {
-        get: function(){
-            return this.bottom - this.top;
-        }
-    }
-
-});
 
 /**
 
@@ -80,41 +47,6 @@ Element.prototype = {
                 this.__children[i].update();
             }
         }
-    },
-
-    getBounds: function( inner )
-    {
-        var bounds = new Rect();
-
-        if( inner ){
-
-            var children = this.children;
-            var childBounds;
-
-            for( var i = 0; i<children.length; i++ ){
-
-                childBounds = children[i].getBounds();
-
-                bounds.left = Math.min( bounds.left, childBounds.left );
-                bounds.top = Math.min( bounds.top, childBounds.top );
-                bounds.right = Math.max( bounds.right, childBounds.right );
-                bounds.bottom = Math.max( bounds.bottom, childBounds.bottom );
-
-            }
-
-            bounds.width = bounds.right - bounds.left;
-            bounds.height = bounds.bottom - bounds.top;
-
-        }else{
-            bounds.left = this.position.x;
-            bounds.top  = this.position.y;
-            bounds.right = bounds.left + this.size.width;
-            bounds.bottom = bounds.top + this.size.height;
-            bounds.width = this.size.width;
-            bounds.height = this.size.height;
-        }
-
-        return bounds;
     },
 
     recalculateProxyViewSizes: function( recursive ){

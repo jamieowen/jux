@@ -28,6 +28,7 @@ var Scroller = function( pointerEvents, wheelEvents, opts ){
     EventEmitter.call( this );
 
     this.scrolling = false;
+    this.down = false;
 
     this.pointerEvents = pointerEvents;
     this.wheelEvents   = wheelEvents;
@@ -46,6 +47,8 @@ var Scroller = function( pointerEvents, wheelEvents, opts ){
             this.axes[i] = false;
         }
     }
+
+
 };
 
 module.exports = Scroller;

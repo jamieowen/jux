@@ -95,7 +95,12 @@ ScrollerAxis.prototype = {
     },
 
     update: function(dt){
-        
+
+        if( Math.abs( this.moveAmount ) <= 0 ) {
+            // prevent scroll when no movement.
+            return false;
+        }
+
         if( this.scrolling ){
             var pos = this.scrollStart + this.moveAmount;
         }else{
