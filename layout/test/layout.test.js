@@ -60,12 +60,12 @@ test( 'find children in bounds', function( t ){
         top: 0,
         left: 0,
         right: 500,
-        bottom: 209 // TODO - this should be 21 - include the bottom element.
+        bottom: 201
     };
 
     var result = layout.find( bounds );
 
-    t.equals( result.length, 20, 'find children within bounds.' );
+    t.equals( result.length, 21, 'find children within bounds.' );
 
     t.end();
 

@@ -1,6 +1,6 @@
 
-var getBounds = require( '../bounds/getBounds' );
-var contains  = require( '../bounds/contains' );
+var getBounds  = require( '../bounds/getBounds' );
+var intersects = require( '../bounds/intersects' );
 
 var Layout = function( element, layoutStrategy ){
 
@@ -71,7 +71,7 @@ Layout.prototype = {
 
             childBounds = getBounds( fakeElement );
 
-            if( contains( bounds, childBounds ) ){
+            if( intersects( bounds, childBounds ) ){
 
                 results.push( child );
             }
