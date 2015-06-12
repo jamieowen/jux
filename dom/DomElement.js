@@ -42,7 +42,7 @@ DomElementProxy.prototype = {
             transform += ' scale(' + this.__scale.x + ', ' + this.__scale.y + ')';
         }
 
-        this.view.style.transform = transform;
+        this.view.style.transform = this.view.style.webkitTransform = transform;
 
         // only adjust the view size explicitly if we have changed internally. ( i.e. not from listening to changes in the view )
         if( this.__size && this.__size.modified ){

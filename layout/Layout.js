@@ -81,7 +81,7 @@ Layout.prototype = {
 
     },
 
-    layout: function(){
+    update: function(){
 
         var children = this.element.children;
         var child;

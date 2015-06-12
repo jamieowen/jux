@@ -68,7 +68,7 @@ var transition = function( fromLayout, toLayout, transitionChild, opts ){
         toLayout.layoutElement( fakeTo, idx );
         fromLayout.layoutElement( fakeFrom, idx );
         
-        transitionChild( child, fakeFrom, fakeTo, visibility, i );
+        transitionChild( child, fakeFrom, fakeTo, visibility, i, idx );
     }
 
     // trigger optional on out of bounds.
@@ -91,7 +91,7 @@ var transition = function( fromLayout, toLayout, transitionChild, opts ){
                 toLayout.layoutElement( fakeTo, i );
                 fromLayout.layoutElement( fakeFrom, i );
 
-                transitionChild( child, fakeFrom, fakeTo, -1, i );
+                transitionChild( child, fakeFrom, fakeTo, -1, i, i );
             }
         }
     }

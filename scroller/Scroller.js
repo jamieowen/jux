@@ -29,6 +29,7 @@ var Scroller = function( pointerEvents, wheelEvents, opts ){
 
     this.scrolling = false;
     this.down = false;
+    this.enabled = true;
 
     this.pointerEvents = pointerEvents;
     this.wheelEvents   = wheelEvents;
@@ -66,6 +67,10 @@ mixes( Scroller, {
 
     onPointer: function( type, position ){
 
+        if( !this.enabled ){
+            return;
+        }
+
         switch( type ){
 
             case 'pointer-up':
@@ -100,6 +105,10 @@ mixes( Scroller, {
     },
 
     onWheelDelta: function( type, delta ){
+
+        if( !this.enabled ){
+            return;
+        }
 
         for( var i = 0; i<this.axes.length; i++ ){
             if( this.axes[i] ){
