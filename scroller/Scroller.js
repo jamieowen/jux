@@ -282,6 +282,17 @@ Scroller.prototype.setMax = function( x, y, z ){
 	return this;
 };
 
+Scroller.prototype.setOvershoot = function( value ){
+
+	for( var i = 0; i<this.axes.length; i++ ){
+		if( this.axes[i] ){
+			this.axes[i].overshoot = value;
+		}
+	}
+
+	return this;
+};
+
 
 Scroller.prototype.getPosition = function( axis ){
 	if( this.axes[axis] ){
@@ -290,6 +301,7 @@ Scroller.prototype.getPosition = function( axis ){
 		return NaN;
 	}
 };
+
 
 
 Scroller.prototype.dispose = function(){
