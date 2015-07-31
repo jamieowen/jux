@@ -5,7 +5,7 @@ var pull = require( 'jux/physics/pull' );
 // wrap in a function to specify different
 
 var defaultOvershootMethod = function( begin, end, speed ){
-    var force = 3;
+	var force = 7.5;
     return pull( begin, end, speed, force );
 };
 
@@ -16,13 +16,14 @@ var defaultOvershootMethod = function( begin, end, speed ){
  */
 var ScrollerAxis = function(){
 
-    this.snapSize = 0;
+    this.snapSize = 0; // not implemented yet
     this.position = 0;
 
     this.min = 0;
     this.max = 0;
     this.viewSize = 0;
 
+	this.maxSpeed = 50;
     this.speed = 0;
     this.friction = 0.9655;
 
@@ -60,12 +61,14 @@ ScrollerAxis.prototype = {
             this.moveAmount = 0;
             this.moveLast = 0;
             this.scrolling = true;
+			this.scrollShouldEnd = false;
         }
     },
 
     stop: function(){
 
         if( this.scrolling ){
+			this.scrolling = false;
             this.scrollShouldEnd = true;
         }
     },
@@ -96,12 +99,14 @@ ScrollerAxis.prototype = {
 
     update: function(dt){
 
+		// NEed to check this part?
         if( Math.abs( this.moveAmount ) <= 0 ) {
             // prevent scroll when no movement.
-            return false;
+			this.scrollShouldEnd = false;
+			return false;
         }
 
-        if( this.scrolling ){
+        if( this.scrolling || this.scrollShouldEnd ){
             var pos = this.scrollStart + this.moveAmount;
         }else{
             pos = this.position;
@@ -121,12 +126,11 @@ ScrollerAxis.prototype = {
 
         this.speed *= this.friction;
 
-        var maxSpeed = 20;
-        if( Math.abs(this.speed) > maxSpeed ){
-            this.speed = maxSpeed * ( this.speed / Math.abs(this.speed) );
+        if( Math.abs(this.speed) > this.maxSpeed ){
+            this.speed = this.maxSpeed * ( this.speed / Math.abs(this.speed) );
         }
 
-        if( this.scrolling ){
+        if( this.scrolling || this.scrollShouldEnd ){
 
             var overshotDrag = this.overshotNorm / ( 1 / this.overshoot );
             //console.log( this.position, this.scrollStart, this.moveLast, overshotMin, overshotMax, this.scrollShouldEnd );
@@ -142,6 +146,7 @@ ScrollerAxis.prototype = {
             this.speed = 0;
 
             if( this.scrollShouldEnd ){
+
                 this.scrolling = false;
                 this.scrollShouldEnd = false;
                 // add the 'throw' speed increase.
@@ -182,7 +187,6 @@ ScrollerAxis.prototype = {
 
                     this.speed = this.snapEase.speed;
                     this.snapEase = null;
-                    return true;
                 }
 
             }else

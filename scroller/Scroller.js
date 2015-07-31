@@ -1,13 +1,11 @@
 
-var inherit      = require( 'inherits' );
-var mixes        = require( 'mixes' );
-
 var EventEmitter = require( 'events' );
 var ScrollerAxis = require( './ScrollerAxis' );
 
 
 var defaultOpts = {
-    axes: [ false, true, false ]
+    axes: [ false, true, false ],
+	bounds: null // supply a rect object { left: 0, top: 0, right: 500, bottom: 500 }
 };
 
 /**
@@ -20,25 +18,32 @@ var defaultOpts = {
  * @constructor
  *
  */
-var Scroller = function( pointerEvents, wheelEvents, opts ){
+var Scroller = function( pointerEvents, opts ){
 
     opts = opts || {};
     opts.axes = opts.axes || defaultOpts.axes;
+	opts.bounds = opts.bounds || defaultOpts.bounds;
 
     EventEmitter.call( this );
+
+
+	this.bounds = opts.bounds;
 
     this.scrolling = false;
     this.down = false;
     this.enabled = true;
 
     this.pointerEvents = pointerEvents;
-    this.wheelEvents   = wheelEvents;
+	//this.wheelEvents   = wheelEvents;
 
-    pointerEvents.on( 'pointer-up', this.onPointer.bind(this) );
-    pointerEvents.on( 'pointer-down', this.onPointer.bind(this) );
-    pointerEvents.on( 'pointer-move', this.onPointer.bind(this) );
+	this._onPointer = this.onPointer.bind(this);
+	this.pointerEvents.on( 'pointer-up', this._onPointer );
+	this.pointerEvents.on( 'pointer-down', this._onPointer );
+	this.pointerEvents.on( 'pointer-move', this._onPointer );
 
-    wheelEvents.on( 'wheel-delta', this.onWheelDelta.bind(this) );
+    //wheelEvents.on( 'wheel-delta', this.onWheelDelta.bind(this) );
+
+	this.deferredInteractions = [];
 
     this.axes = [];
     for( var i = 0; i<3; i++ ){
@@ -48,7 +53,6 @@ var Scroller = function( pointerEvents, wheelEvents, opts ){
             this.axes[i] = false;
         }
     }
-
 
 };
 
@@ -62,156 +66,238 @@ Scroller.OVERSHOT_MIN = 'overshot-min';
 Scroller.OVERSHOT_MAX = 'overshot-max';
 
 
-inherit( Scroller, EventEmitter );
-mixes( Scroller, {
+Scroller.prototype = Object.create( EventEmitter.prototype );
 
-    onPointer: function( type, position ){
 
-        if( !this.enabled ){
-            return;
-        }
+Scroller.prototype._inBounds = function( position ){
 
-        switch( type ){
+	var b = this.bounds;
 
-            case 'pointer-up':
+	if( b ){
+		var x = position[0];
+		var y = position[1];
+		if( x >= b.left && x<=b.right && y>=b.top && y<=b.bottom ){
+			return true;
+		}else{
+			return false;
+		}
+	}else{
+		return true;
+	}
+};
 
-                for( var i = 0; i<this.axes.length; i++ ){
-                    if( this.axes[i] )
-                        this.axes[i].stop();
-                }
 
-                break;
+Scroller.prototype.onPointer = function( type, position ){
 
-            case 'pointer-down':
+	if( !this.enabled ){
+		return;
+	}
 
-                for( var i = 0; i<this.axes.length; i++ ){
-                    if( this.axes[i] )
-                        this.axes[i].start();
-                }
+	switch( type ){
 
-                break;
+		case 'pointer-up':
 
-            case 'pointer-move':
+			for( var i = 0; i<this.axes.length; i++ ){
+				if( this.axes[i] )
+					this.axes[i].stop();
+			}
 
-                for( var i = 0; i<this.axes.length; i++ ){
-                    if( this.axes[i] )
-                        this.axes[i].move( this.pointerEvents.position[i] - this.pointerEvents.previous[i] );
-                }
+			this.down = false;
 
-                break;
+			break;
 
-        }
+		case 'pointer-down':
 
-    },
+			if( !this._inBounds( position ) ){
+				return;
+			}
 
-    onWheelDelta: function( type, delta ){
+			for( var i = 0; i<this.axes.length; i++ ){
+				if( this.axes[i] )
+					this.axes[i].start();
+			}
 
-        if( !this.enabled ){
-            return;
-        }
+			this.down = true;
 
-        for( var i = 0; i<this.axes.length; i++ ){
-            if( this.axes[i] ){
-                this.axes[i].wheelDelta( delta[i] );
-            }
-        }
-    },
+			break;
 
-    update: function( dt ){
+		case 'pointer-move':
 
-        var changed = false;
-        var axis;
+			if( !this.down ){
+				return;
+			}
 
-        for( var i = 0; i<this.axes.length; i++ ){
-            axis = this.axes[i];
-            if( axis ){
-                changed = changed || axis.update(dt);
+			for( var i = 0; i<this.axes.length; i++ ){
+				if( this.axes[i] )
+					this.axes[i].move( this.pointerEvents.position[i] - this.pointerEvents.previous[i] );
+			}
 
-                if( changed && axis.overshotMin ){
-                    this.emit( Scroller.OVERSHOT_MIN, i, axis.overshotNorm );
-                }else
-                if( changed && axis.overshotMax ){
-                    this.emit( Scroller.OVERSHOT_MAX, i, axis.overshotNorm );
-                }
-            }
-        }
+			break;
 
-        if( changed ) {
-            this.scrolling = true;
-            this.emit(Scroller.SCROLL);
-        }else{
-            this.scrolling = false;
-        }
+	}
 
-    },
+};
 
-    /**
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @returns {*}
-     */
-    setSnapSize: function( x, y, z ){
 
-        for( var i = 0; i<this.axes.length; i++ ){
-            if( this.axes[i] && !isNaN(arguments[i]) ){
-                this.axes[i].snapSize = arguments[i];
+Scroller.prototype.onWheelDelta = function( type, delta ){
 
-            }
-        }
+	if( !this.enabled ){
+		return;
+	}
 
-        return this;
-    },
+	for( var i = 0; i<this.axes.length; i++ ){
+		if( this.axes[i] ){
+			this.axes[i].wheelDelta( delta[i] );
+		}
+	}
+};
 
-    setViewSize: function( x, y, z ){
 
-        for( var i = 0; i<this.axes.length; i++ ){
-            if( this.axes[i] && !isNaN(arguments[i]) ){
-                this.axes[i].viewSize = arguments[i];
+Scroller.prototype.update = function( dt ){
 
-            }
-        }
+	var changed = false;
+	var axis;
+	var i;
 
-        return this;
-    },
+	// handle deferred interactions.
+	if( this.deferredInteractions.length ){
 
-    setMinBounds: function( x, y, z ){
+		var shouldEnd = true; // check all axis are going to stop interaction.
+		var moveAmount = 0;
+		var speed = 0;
 
-        for( var i = 0; i<this.axes.length; i++ ){
-            if( this.axes[i] && !isNaN(arguments[i]) ){
-                this.axes[i].min = arguments[i];
+		for( i = 0; i<this.axes.length; i++ ){
+			axis = this.axes[i];
+			if( axis ){
+				shouldEnd = shouldEnd && axis.scrollShouldEnd;
+				moveAmount = Math.max( Math.abs( axis.moveAmount ), moveAmount );
+				speed = Math.max( Math.abs( axis.speed ), speed );
+			}
+		}
 
-            }
-        }
+		// trigger interactions. ( this could possibly do this after update? )
+		if( shouldEnd ){
 
-        return this;
-    },
+			if( moveAmount < 2 && speed < 1 ) {
+				for (i = 0; i < this.deferredInteractions.length; i++) {
+					this.deferredInteractions[i]();
+				}
+			}
+			this.deferredInteractions.splice(0);
+		}
+	}
 
-    setMaxBounds: function( x, y, z ){
+	// handle update
+	for( i = 0; i<this.axes.length; i++ ){
+		axis = this.axes[i];
+		if( axis ){
 
-        for( var i = 0; i<this.axes.length; i++ ){
-            if( this.axes[i] && !isNaN(arguments[i]) ){
-                this.axes[i].max = arguments[i];
-            }
-        }
+			changed = changed || axis.update(dt);
 
-        return this;
-    },
+			if( changed && axis.overshotMin ){
+				this.emit( Scroller.OVERSHOT_MIN, i, axis.overshotNorm );
+			}else
+			if( changed && axis.overshotMax ){
+				this.emit( Scroller.OVERSHOT_MAX, i, axis.overshotNorm );
+			}
+		}
+	}
 
-    getPosition: function( axis ){
-        if( this.axes[axis] ){
-            return this.axes[axis].position;
-        }else{
-            return NaN;
-        }
-    },
+	if( changed ) {
+		this.scrolling = true;
+		this.emit(Scroller.SCROLL);
+	}else{
+		this.scrolling = false;
+	}
 
-    dispose: function(){
-        this.pointerEvents.removeListener( 'pointer-down', this.onPointer );
-        this.pointerEvents.removeListener( 'pointer-down', this.onPointer );
-    }
-});
+	return changed;
+
+};
+
+
+/**
+ * Determines whether to trigger a click/tap event instead of scroll event.
+ * Useful for when the scrolling items are interactive and you need to determine
+ * handling the click based on the scroll speed.
+ *
+ * @param handler
+ */
+Scroller.prototype.handleInteraction = function( cb ){
+	this.deferredInteractions.push( cb );
+};
+
+/**
+ *
+ * @param x
+ * @param y
+ * @param z
+ * @returns {*}
+ */
+Scroller.prototype.setSnapSize = function( x, y, z ){
+
+	for( var i = 0; i<this.axes.length; i++ ){
+		if( this.axes[i] && !isNaN(arguments[i]) ){
+			this.axes[i].snapSize = arguments[i];
+
+		}
+	}
+
+	return this;
+};
+
+
+Scroller.prototype.setViewSize = function( x, y, z ){
+
+	for( var i = 0; i<this.axes.length; i++ ){
+		if( this.axes[i] && !isNaN(arguments[i]) ){
+			this.axes[i].viewSize = arguments[i];
+
+		}
+	}
+
+	return this;
+};
+
+Scroller.prototype.setMin = function( x, y, z ){
+
+	for( var i = 0; i<this.axes.length; i++ ){
+		if( this.axes[i] && !isNaN(arguments[i]) ){
+			this.axes[i].min = arguments[i];
+
+		}
+	}
+
+	return this;
+};
+
+
+Scroller.prototype.setMax = function( x, y, z ){
+
+	for( var i = 0; i<this.axes.length; i++ ){
+		if( this.axes[i] && !isNaN(arguments[i]) ){
+			this.axes[i].max = arguments[i];
+		}
+	}
+
+	return this;
+};
+
+
+Scroller.prototype.getPosition = function( axis ){
+	if( this.axes[axis] ){
+		return this.axes[axis].position;
+	}else{
+		return NaN;
+	}
+};
+
+
+Scroller.prototype.dispose = function(){
+
+	this.pointerEvents.off( 'pointer-up', this._onPointer );
+	this.pointerEvents.off( 'pointer-down', this._onPointer );
+	this.pointerEvents.off( 'pointer-move', this._onPointer );
+};
 
 
 
