@@ -5,7 +5,7 @@ var ScrollerAxis = require( './ScrollerAxis' );
 
 var defaultOpts = {
     axes: [ false, true, false ],
-	bounds: null // supply a rect object { left: 0, top: 0, right: 500, bottom: 500 }
+	pointerBounds: null // supply a rect object { left: 0, top: 0, right: 500, bottom: 500 }
 };
 
 /**
@@ -22,12 +22,11 @@ var Scroller = function( pointerEvents, opts ){
 
     opts = opts || {};
     opts.axes = opts.axes || defaultOpts.axes;
-	opts.bounds = opts.bounds || defaultOpts.bounds;
+	opts.pointerBounds = opts.pointerBounds || defaultOpts.pointerBounds;
 
     EventEmitter.call( this );
 
-
-	this.bounds = opts.bounds;
+	this.pointerBounds = opts.pointerBounds;
 
     this.scrolling = false;
     this.down = false;
@@ -71,7 +70,7 @@ Scroller.prototype = Object.create( EventEmitter.prototype );
 
 Scroller.prototype._inBounds = function( position ){
 
-	var b = this.bounds;
+	var b = this.pointerBounds;
 
 	if( b ){
 		var x = position[0];

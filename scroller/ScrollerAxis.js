@@ -83,9 +83,9 @@ ScrollerAxis.prototype = {
 
     wheelDelta: function( delta ){
         if( !this.scrolling ){
-            var contentHeight = ( this.max - this.min ) - this.viewSize;
+            var contentSize = ( this.max - this.min ) - this.viewSize;
             var overshotMin = this.position > this.min;
-            var overshotMax = this.position < -contentHeight;
+            var overshotMax = this.position < -contentSize;
 
             if( !overshotMin && !overshotMax ){
 
@@ -112,16 +112,17 @@ ScrollerAxis.prototype = {
             pos = this.position;
         }
         
-        var contentHeight = ( this.max - this.min ) - this.viewSize;
+        var contentSize = Math.max( ( this.max - this.min ) - this.viewSize, 0 ); // make sure content size isn't negative
+
         var overshoot = this.viewSize * this.overshoot;
         this.overshotMin = pos > this.min;
-        this.overshotMax = pos < -contentHeight;
+        this.overshotMax = pos < -contentSize;
 
         if( this.overshotMin ){
             this.overshotNorm = Math.abs( this.min - pos ) / overshoot; // 0 - 1.0, 2.5, etc
         }else
         if( this.overshotMax ){
-            this.overshotNorm = Math.abs( -contentHeight - pos ) / overshoot;
+            this.overshotNorm = Math.abs( -contentSize - pos ) / overshoot;
         }
 
         this.speed *= this.friction;
@@ -138,7 +139,7 @@ ScrollerAxis.prototype = {
                 this.position = this.min + ( overshoot * overshotDrag );
             }else
             if( this.overshotMax ){
-                this.position = -contentHeight - ( overshoot * overshotDrag );
+                this.position = -contentSize - ( overshoot * overshotDrag );
             }else{
                 this.position = pos;
             }
@@ -169,7 +170,7 @@ ScrollerAxis.prototype = {
                     this.snapEase = this.overshootMethod( this.position, this.min, this.speed );
                 }else
                 if( this.overshotMax ){
-                    this.snapEase = this.overshootMethod( this.position, -contentHeight, this.speed );
+                    this.snapEase = this.overshootMethod( this.position, -contentSize, this.speed );
                 }
 
             }else
