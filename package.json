@@ -1,8 +1,8 @@
 {
-  "name": "jux",
+  "name": "@jux/x",
   "version": "1.0.0",
   "description": "",
-  "main": "src",
+  "main": "index.js",
   "directories": {
     "doc": "docs"
   },
