@@ -37,7 +37,7 @@ module.exports = {
 
 	binarySearch: binarySearch,
 
-	geLeft: function( objects, bounds, proxy, start, end ){
+	searchX: function( objects, bounds, proxy, start, end ){
 
 		if( objects.length === 0 ){
 			return -1;
@@ -60,7 +60,7 @@ module.exports = {
 		return res >= objects.length ? -1 : res;
 	},
 
-	geTop: function( objects, bounds, proxy, start, end ){
+	searchY: function( objects, bounds, proxy, start, end ){
 
 		if( objects.length === 0 ){
 			return -1;
@@ -92,7 +92,7 @@ module.exports = {
 	 * @param start
 	 * @param end
 	 */
-	geTopLeft: function( partitionedObjects, partitionedIndex, bounds, proxy, start, end ){
+	searchXY: function( partitionedObjects, partitionedIndex, bounds, proxy, start, end ){
 
 		if( partitionedObjects.length === 0 ){
 			return -1;

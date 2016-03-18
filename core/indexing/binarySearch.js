@@ -23,7 +23,7 @@ BinarySearch.prototype = {
 
 		if( this.axis === 0 ){
 
-			idx = searchBounds.geLeft( this.objects, viewBounds, proxy );
+			idx = searchBounds.searchX( this.objects, viewBounds, proxy );
 
 			if( idx === -1 ){
 				return results;
@@ -48,7 +48,7 @@ BinarySearch.prototype = {
 		}else
 		if( this.axis === 1 ){
 
-			idx = searchBounds.geTop( this.objects, viewBounds, proxy );
+			idx = searchBounds.searchY( this.objects, viewBounds, proxy );
 
 			if( idx === -1 ){
 				return results;
