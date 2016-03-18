@@ -1,9 +1,9 @@
 var test = require( 'tape' );
 
-var Bounds = require( '../src/bounds/Bounds' );
+var Bounds = require( '../core/bounds/Bounds' );
 
-var contains   = require( '../src/bounds/contains' );
-var intersects = require( '../src/bounds/intersects' );
+var contains   = require( '../core/bounds/contains' );
+var intersects = require( '../core/bounds/intersects' );
 
 test( 'intersect & contains', function( t ){
 

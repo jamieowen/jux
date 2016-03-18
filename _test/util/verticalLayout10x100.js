@@ -1,6 +1,6 @@
 
-var Layout 		= require( '../../src/Layout' );
-var vertical 	= require( '../../src/layouts/vertical' );
+var Layout 		= require( '../../core/Layout' );
+var vertical 	= require( '../../core/layouts/vertical' );
 
 module.exports = function verticalLayout(){
 

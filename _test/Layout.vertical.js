@@ -1,9 +1,9 @@
 
 var test = require( 'tape' );
 
-var Layout = require( '../src/Layout' );
+var Layout = require( '../core/Layout' );
 
-var vertical = require( '../src/layouts/vertical' );
+var vertical = require( '../core/layouts/vertical' );
 var getExpected = require( './util/getExpected' );
 var getActual = require( './util/getActual' );
 

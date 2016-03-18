@@ -1,6 +1,6 @@
 
-var Layout 		= require( '../../src/Layout' );
-var grid 		= require( '../../src/layouts/grid' );
+var Layout 		= require( '../../core/Layout' );
+var grid 		= require( '../../core/layouts/grid' );
 
 module.exports = function gridLayout(){
 

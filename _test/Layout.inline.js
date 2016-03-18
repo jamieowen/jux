@@ -1,7 +1,7 @@
 
 var test = require( 'tape' );
 
-var Layout 	= require( '../src/Layout' );
+var Layout 	= require( '../core/Layout' );
 
 
 test( 'Layout Custom Inline.', function( t ){

@@ -2,7 +2,7 @@
 // build a list of expected values for a layout method
 // just to test things are running through the Layout class correctly.
 
-var Proxy = require( '../../src/bounds/BoundsProxy' ); // could poss not require this and create custom..
+var Proxy = require( '../../core/bounds/BoundsProxy' ); // could poss not require this and create custom..
 
 var getExpected = function( layoutMethod, dataItems ){
 

@@ -1,6 +1,6 @@
 
 var test 	= require( 'tape' );
-var Proxy 	= require( '../src/bounds/BoundsProxy' );
+var Proxy 	= require( '../core/bounds/BoundsProxy' );
 
 test( 'set/get values', function(t){
 

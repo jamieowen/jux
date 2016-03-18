@@ -1,11 +1,11 @@
 
 var test = require( 'tape' );
 
-var searchBounds = require( '../src/indexing/util/searchBounds' );
+var searchBounds = require( '../core/indexing/util/searchBounds' );
 var horizontalLayout10x100 	= require( './util/horizontalLayout10x100' );
 
-var Bounds = require( '../src/bounds/Bounds' );
-var Proxy  = require( '../src/bounds/BoundsProxy' );
+var Bounds = require( '../core/bounds/Bounds' );
+var Proxy  = require( '../core/bounds/BoundsProxy' );
 
 test( 'Search Bounds Left.', function( t ){
 

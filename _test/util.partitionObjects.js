@@ -1,12 +1,12 @@
 
 var test = require( 'tape' );
 
-var partitionObjects 	= require( '../src/indexing/util/partitionObjects' );
-var partitionIndex 		= require( '../src/indexing/util/partitionIndex' );
+var partitionObjects 	= require( '../core/indexing/util/partitionObjects' );
+var partitionIndex 		= require( '../core/indexing/util/partitionIndex' );
 var gridLayout100x100 	= require( './util/gridLayout100x100' );
 
-var Bounds = require( '../src/bounds/Bounds' );
-var Proxy  = require( '../src/bounds/BoundsProxy' );
+var Bounds = require( '../core/bounds/Bounds' );
+var Proxy  = require( '../core/bounds/BoundsProxy' );
 
 test( 'Partition Objects -calcParitionSizes.', function( t ){
 

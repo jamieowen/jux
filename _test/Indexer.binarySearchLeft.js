@@ -1,7 +1,7 @@
 
 var test 		= require( 'tape' );
 
-var Bounds 		= require( '../src/bounds/Bounds' );
+var Bounds 		= require( '../core/bounds/Bounds' );
 
 var horizontalLayout10x100 	= require( './util/horizontalLayout10x100' );
 

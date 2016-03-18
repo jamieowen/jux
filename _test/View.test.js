@@ -1,9 +1,9 @@
 
 var test 	 = require( 'tape' );
 
-var Proxy	 = require( '../src/bounds/BoundsProxy' );
-var Layout 	 = require( '../src/Layout' );
-var View 	 = require( '../src/View' );
+var Proxy	 = require( '../core/bounds/BoundsProxy' );
+var Layout 	 = require( '../core/Layout' );
+var View 	 = require( '../core/View' );
 
 
 test( 'Renderer', function( t ){

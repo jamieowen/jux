@@ -1,6 +1,6 @@
 
-var Layout 		= require( '../../src/Layout' );
-var horizontal 	= require( '../../src/layouts/horizontal' );
+var Layout 		= require( '../../core/Layout' );
+var horizontal 	= require( '../../core/layouts/horizontal' );
 
 module.exports = function horizontalLayout(){
 
