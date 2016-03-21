@@ -1,5 +1,6 @@
 
 var Signal 		   = require( 'signals' );
+var objectAssign   = require( 'object-assign' );
 
 var Bounds 		   = require( './bounds/Bounds');
 var DefaultProxy   = require( './bounds/BoundsProxy' );
@@ -8,7 +9,96 @@ var DefaultIndexer = require( './indexing/binarySearch' );
 
 var boundsHelper = new Bounds();
 
-var Layout = function( data, optsOrLayout ){
+
+// Layout( data, opts, function(){}
+// becomes..
+/**
+
+ new Layout( data,
+ 	{
+ 		axis: 'x' -- rename to direction ?
+ 		// -
+ 		indexer: new BinarySearch('x'),
+ 		dataIsRenderer: true
+
+ 	},
+ 	function( i, data, obj, prev, proxy ){
+
+ 	}
+ );
+
+ new Layout( data, {
+ 		axis: 'y',
+ 		proxy: {},
+ 		indexer: {},
+ 		},{
+ 			itemWidth:..,
+ 			itemHeight: ..
+ 		}
+
+ 	}
+
+ layout.opts.width = 1000;
+ layout.opts.itemWidth = 1000;
+
+ var VList =
+  Layout
+  View
+  Scroller
+
+ List.proxy.extend( {
+ added(
+ } );
+
+
+ */
+
+
+var createObservableOpts = function( opts ){
+
+	var ObservableOpts = new Function( 'Signal', [
+		'return function ObservableOpts(){',
+		'	this.onChanged = new Signal();',
+		'}'
+	].join('') );
+
+	for( var key in opts ){
+
+		ObservableOpts.prototype[ '_' + key ] = opts[key];
+
+		Object.defineProperty( ObservableOpts.prototype, key, {
+			get: new Function([
+				'return this._' + key + ';'
+			].join('')),
+			set: new Function( 'value', [
+				'this._' + key + ' = value;',
+				'this.onChanged.dispatch("' + key + '")'
+			].join(''))
+		} );
+
+	};
+
+	return new ObservableOpts();
+
+};
+
+var createSignalOpts = function( opts, defaultOpts ){
+
+	defaultOpts = defaultOpts || {};
+
+	var construct = new Function( 'Layout', 'axis', 'defaultOpts', [
+		'',
+		'return function ' + className + 'Layout( data, opts ){',
+		'	Layout.call( this, axis, opts, defaultOpts );',
+		'	this.data = data;',
+		'',
+		'}',
+		''
+	].join('') );
+};
+
+//var Layout = function( data, config, opts, strategy ){
+var Layout = function( data, optsOrLayout, defaultOpts ){
 
 	if( typeof optsOrLayout === 'function' ){
 		this._layout = optsOrLayout;
@@ -24,6 +114,7 @@ var Layout = function( data, optsOrLayout ){
 	}
 
 	this._data = data;
+
 	this._proxy = optsOrLayout.proxy || new DefaultProxy();
 	this._indexer = optsOrLayout.indexer || new DefaultIndexer(1);
 	this._dataIsRenderer = optsOrLayout.dataIsRenderer === undefined ? false : optsOrLayout.dataIsRenderer;
@@ -46,6 +137,46 @@ var Layout = function( data, optsOrLayout ){
 
 
 module.exports = Layout;
+
+var createLayoutClass = function( className, config, defaultOpts, strategy ){
+
+	defaultOpts = defaultOpts || {};
+
+	var construct = new Function( 'Layout', 'axis', 'defaultOpts', [
+		'',
+		'return function ' + className + 'Layout( data, opts ){',
+		'	Layout.call( this, axis, opts, defaultOpts );',
+		'	this.data = data;',
+		'',
+		'}',
+		''
+	].join('') );
+
+	var NewLayoutClass = construct( Layout, axis, defaultOpts );
+
+	NewLayoutClass.prototype = Object.create( Layout.prototype );
+	NewLayoutClass.prototype.constructor = NewLayoutClass;
+	NewLayoutClass.prototype.layout = strategy;
+
+	for( var key in defaultOpts ){
+
+		NewLayoutClass.prototype[ '_' + key ] = defaultOpts[key];
+
+		Object.defineProperty( NewLayoutClass.prototype, key, {
+			get: new Function([
+				'return this._' + key + ';'
+			].join('')),
+			set: new Function( 'value', [
+				'this._' + key + ' = value;',
+				'this.onChanged.dispatch("' + key + '")'
+			].join(''))
+		} );
+
+	}
+
+	return cls;
+
+};
 
 
 Layout.prototype = {
