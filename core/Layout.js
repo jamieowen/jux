@@ -2,6 +2,7 @@
 var Signal 		   = require( 'signals' );
 var objectAssign   = require( 'object-assign' );
 
+var observableOpts = require( './util/ObservableOpts' );
 var Bounds 		   = require( './bounds/Bounds');
 var DefaultProxy   = require( './bounds/BoundsProxy' );
 var DefaultLayout  = require( './layouts/vertical' );
@@ -53,10 +54,10 @@ var boundsHelper = new Bounds();
 
  */
 
-//var Layout = function( data, config, opts, strategy ){
-var Layout = function( data, optsOrLayout, defaultOpts ){
+var Layout = function( data, config, opts, strategy ){
+//var Layout = function( data, optsOrLayout, defaultOpts ){
 
-	if( typeof optsOrLayout === 'function' ){
+	/**if( typeof optsOrLayout === 'function' ){
 		this._layout = optsOrLayout;
 		this.layoutOpts = optsOrLayout.defaultOpts;
 	}else
@@ -67,12 +68,17 @@ var Layout = function( data, optsOrLayout, defaultOpts ){
 		this._layout = DefaultLayout;
 		this.layoutOpts = DefaultLayout.defaultOpts;
 		optsOrLayout = {};
-	}
+	}**/
+
+	this.opts = observableOpts( opts );
+	this.opts.onChanged.add();
 
 	this._data = data;
 
-	this._proxy = optsOrLayout.proxy || new DefaultProxy();
-	this._indexer = optsOrLayout.indexer || new DefaultIndexer(1);
+	this.axis = config.axis;
+
+	this._proxy = config.proxy || new DefaultProxy();
+	this._indexer = config.indexer || new DefaultIndexer(1);
 	this._dataIsRenderer = optsOrLayout.dataIsRenderer === undefined ? false : optsOrLayout.dataIsRenderer;
 	this._results = [];
 
@@ -87,6 +93,8 @@ var Layout = function( data, optsOrLayout, defaultOpts ){
 	this.needsLayoutUpdate = true;
 	this.needsIndexerUpdate = true;
 
+	this.onUpdate = new Signal();
+	this.onUpdated = new Signal();
 	this.onLayoutUpdated = new Signal();
 
 };
@@ -171,40 +179,6 @@ Object.defineProperties( Layout.prototype, {
 
 			this.needsLayoutUpdate = true;
 			this.onLayoutUpdated.dispatch();
-
-		}
-	},
-
-	layout: {
-		get: function(){
-			return this._layout;
-		},
-
-		set: function( layout ){
-			if( this._layout === layout ){
-				return;
-			}
-
-			this._layout = layout;
-
-			this.needsLayoutUpdate = true;
-			this.onLayoutUpdated.dispatch();
-		}
-	},
-
-	indexer: {
-		get: function(){
-			return this._indexer;
-		},
-
-		set: function( indexer ){
-			if( this._indexer === indexer ){
-				return;
-			}
-
-			this._indexer = indexer;
-
-			this.needsIndexerUpdate = true;
 
 		}
 	}

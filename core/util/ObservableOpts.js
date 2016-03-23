@@ -2,7 +2,6 @@
 var Signal 		 = require( 'signals' );
 var objectAssign = require( 'object-assign' );
 
-
 var cached = {};
 
 var createObservableOpts = function( opts ){
@@ -21,6 +20,8 @@ var createObservableOpts = function( opts ){
 		'	objectAssign( this, opts );',
 		'}'
 	].join('') )( Signal, objectAssign );
+
+	ObservableOpts.prototype.constructor = ObservableOpts;
 
 	for( key in opts ){
 
