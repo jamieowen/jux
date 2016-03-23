@@ -2,96 +2,55 @@
 var Signal 		   = require( 'signals' );
 var objectAssign   = require( 'object-assign' );
 
-var observableOpts = require( './util/ObservableOpts' );
+var ObservableOpts = require( './util/ObservableOpts' );
 var Bounds 		   = require( './bounds/Bounds');
-var DefaultProxy   = require( './bounds/BoundsProxy' );
-var DefaultLayout  = require( './layouts/vertical' );
-var DefaultIndexer = require( './indexing/binarySearch' );
 
 var boundsHelper = new Bounds();
 
 
-// Layout( data, opts, function(){}
-// becomes..
-/**
+var Layout = function( data, opts, config, layoutMethod ){
 
- new Layout( data,
- 	{
- 		axis: 'x' -- rename to direction ?
- 		// -
- 		indexer: new BinarySearch('x'),
- 		dataIsRenderer: true
+	if( !data || !opts || !config || !layoutMethod ){
+		throw new Error( 'All arguments for Layouts must be specified.' );
+	}
 
- 	},
- 	function( i, data, obj, prev, proxy ){
+	// TODO : For ease of use - may be only ask for axis config..
+	// Or default 2 'xy' BinarySearch
 
- 	}
- );
+	if( !config.axis || !config.proxy || config.indexer ){
+		throw new Error( 'Missing configuration arguments for Layout.' );
+	}
 
- new Layout( data, {
- 		axis: 'y',
- 		proxy: {},
- 		indexer: {},
- 		},{
- 			itemWidth:..,
- 			itemHeight: ..
- 		}
+	this.needsLayoutUpdate = true;
+	this.needsIndexerUpdate = true;
 
- 	}
+	this.onOptsChanged = this.onOptsChanged.bind(this);
+	this.opts = ObservableOpts( opts );
+	this.opts.onChanged.add( function(){
+		this.needsLayoutUpdate = true;
+	}.bind(this) );
 
- layout.opts.width = 1000;
- layout.opts.itemWidth = 1000;
-
- var VList =
-  Layout
-  View
-  Scroller
-
- List.proxy.extend( {
- added(
- } );
+	this._data 	 = data;
+	this.axis    = config.axis;
+	this.proxy   = config.proxy;
+	this.indexer = config.indexer;
+	this.layout  = layoutMethod;
 
 
- */
-
-var Layout = function( data, config, opts, strategy ){
-//var Layout = function( data, optsOrLayout, defaultOpts ){
-
-	/**if( typeof optsOrLayout === 'function' ){
-		this._layout = optsOrLayout;
-		this.layoutOpts = optsOrLayout.defaultOpts;
-	}else
-	if( typeof optsOrLayout === 'object' ){
-		this._layout = optsOrLayout.layout || DefaultLayout;
-		this.layoutOpts = optsOrLayout.layoutOpts || this._layout.defaultOpts;
-	}else{
-		this._layout = DefaultLayout;
-		this.layoutOpts = DefaultLayout.defaultOpts;
-		optsOrLayout = {};
-	}**/
-
-	this.opts = observableOpts( opts );
-	this.opts.onChanged.add();
-
-	this._data = data;
-
-	this.axis = config.axis;
-
-	this._proxy = config.proxy || new DefaultProxy();
-	this._indexer = config.indexer || new DefaultIndexer(1);
-	this._dataIsRenderer = optsOrLayout.dataIsRenderer === undefined ? false : optsOrLayout.dataIsRenderer;
-	this._results = [];
+	//this._proxy = config.proxy || new DefaultProxy();
+	//this._indexer = config.indexer || new DefaultIndexer(1);
+	//this._dataIsRenderer = optsOrLayout.dataIsRenderer === undefined ? false : optsOrLayout.dataIsRenderer;
 
 	this.bounds = new Bounds();
-	this.margin = {
+	this.padding = {
 		left: 0,
 		top: 0,
 		right: 0,
 		bottom: 0
 	};
+
 	this.objects = [];
-	this.needsLayoutUpdate = true;
-	this.needsIndexerUpdate = true;
+
 
 	this.onUpdate = new Signal();
 	this.onUpdated = new Signal();
@@ -107,6 +66,7 @@ Layout.prototype = {
 	update: function(){
 
 		if( this.needsLayoutUpdate ){
+
 			this.needsLayoutUpdate = false;
 			this.needsIndexerUpdate = true;
 
@@ -118,16 +78,16 @@ Layout.prototype = {
 			var bounds = boundsHelper;
 
 			for( i = 0; i<this._data.length; i++ ){
+
 				data = this._data[i];
-				if( this._dataIsRenderer ){
-					obj = data;
-				}else{
+				//if( this._dataIsRenderer ){
+				//	obj = data;
+				//}else{
 					obj = this._proxy.create( data );
 					this._proxy.data_set( obj, data );
-				}
+				//}
 
-				this._layout( i, data, obj, prevObj, this._proxy, this.layoutOpts );
-
+				this._layout( i, data, obj, prevObj, this._proxy, this.opts );
 				this._proxy.bounds_get( obj, bounds );
 
 				// bounds expand() ?
@@ -139,6 +99,7 @@ Layout.prototype = {
 				this.objects.push( obj );
 
 				prevObj = obj;
+
 			}
 
 		}
@@ -152,15 +113,14 @@ Layout.prototype = {
 
 	find: function( viewBounds, results ){
 
-		if( results ){
-			return this._indexer.find( viewBounds, this._proxy, results );
-		}else{
-			this._results.splice(0);
-			return this._indexer.find( viewBounds, this._proxy, this._results );
-		}
+		return this._indexer.find( viewBounds, this._proxy, results );
+
+	},
+
+	// override
+	layout: function( i, data, obj, prevObj, proxy, opts ){
 
 	}
-
 };
 
 Object.defineProperties( Layout.prototype, {

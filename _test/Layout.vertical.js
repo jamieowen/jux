@@ -1,18 +1,18 @@
 
 var test = require( 'tape' );
 
-var Layout = require( '../core/Layout' );
+//var Layout = require( '../core/Layout' );
+//var vertical = require( '../core/layouts/vertical' );
 
-var vertical = require( '../core/layouts/vertical' );
+var vertical	= require( './fixtures/verticalLayout10x100' );
 var getExpected = require( './util/getExpected' );
 var getActual = require( './util/getActual' );
 
 
+
 test( 'Layout Vertical.', function( t ){
 
-	var data = [0,1,2,3,4,5,6,7,8,9].map( function(i){
-		return { num: i };
-	});
+	var data = require( './fixtures/data' )();
 
 	// Test layout
 	var layout = new Layout( data, vertical );
@@ -20,6 +20,8 @@ test( 'Layout Vertical.', function( t ){
 	var w = defaultOpts.itemWidth;
 	var h = defaultOpts.itemHeight;
 	var s = defaultOpts.itemSpacing;
+
+
 
 	// Prepare expected results
 	var expected = getExpected( vertical, data );
