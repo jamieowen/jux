@@ -8,7 +8,7 @@ var getActual = function( layout ){
 	var bounds = {};
 	var point = {};
 
-	var proxy = layout._proxy;
+	var proxy = layout.proxy;
 	var obj,dat;
 
 	for( var i = 0; i<layout.objects.length; i++ ){

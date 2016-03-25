@@ -88,7 +88,6 @@ Layout.prototype = {
 				this.layout( i, data, obj, prevObj, this.proxy, this.opts );
 				this.proxy.bounds_get( obj, bounds );
 
-				// bounds expand() ?
 				this.bounds.x = Math.min( bounds.left, this.bounds.left );
 				this.bounds.y = Math.min( bounds.top, this.bounds.top );
 				this.bounds.width = Math.max( bounds.right, this.bounds.right );

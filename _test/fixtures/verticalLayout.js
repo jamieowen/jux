@@ -11,8 +11,6 @@ module.exports = function verticalLayout(){
 		itemSpacing: 0
 	});
 
-	layout.update();
-
 	return layout;
 
 };

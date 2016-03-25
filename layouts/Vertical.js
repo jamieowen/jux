@@ -26,8 +26,8 @@ var VerticalLayout = function( data, opts ){
 	Layout.call( this, data, opts, config,
 		function layout( i, data, obj, prevObj, proxy, opts ){
 
-			proxy.position_set( 0, opts.itemHeight * i + ( i * opts.itemSpacing ) );
-			proxy.size_set( opts.itemWidth, opts.itemHeight )
+			proxy.position_set( obj, 0, opts.itemHeight * i + ( i * opts.itemSpacing ) );
+			proxy.size_set( obj, opts.itemWidth, opts.itemHeight )
 
 		}
 	)
