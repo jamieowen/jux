@@ -1,12 +1,9 @@
 
 var test = require( 'tape' );
 
-//var Layout = require( '../core/Layout' );
-//var vertical = require( '../core/layouts/vertical' );
-
-var vertical	= require( './fixtures/verticalLayout10x100' );
-var getExpected = require( './util/getExpected' );
-var getActual = require( './util/getActual' );
+var verticalLayout	= require( './fixtures/verticalLayout' );
+var getExpected 	= require( './util/getExpected' );
+var getActual 		= require( './util/getActual' );
 
 
 
@@ -15,16 +12,15 @@ test( 'Layout Vertical.', function( t ){
 	var data = require( './fixtures/data' )();
 
 	// Test layout
-	var layout = new Layout( data, vertical );
-	var defaultOpts = vertical.defaultOpts;
-	var w = defaultOpts.itemWidth;
-	var h = defaultOpts.itemHeight;
-	var s = defaultOpts.itemSpacing;
+	var layout = verticalLayout();
 
+	var w = layout.opts.itemWidth;
+	var h = layout.opts.itemHeight;
+	var s = layout.opts.itemSpacing;
 
 
 	// Prepare expected results
-	var expected = getExpected( vertical, data );
+	var expected = getExpected( layout, data );
 	var expectedBounds = [
 		0,0,w, ( data.length * h ) + ( s * (data.length-1) )
 	];

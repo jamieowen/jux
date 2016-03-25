@@ -2,32 +2,36 @@
 // build a list of expected values for a layout method
 // just to test things are running through the Layout class correctly.
 
-var Proxy = require( '../../core/bounds/BoundsProxy' ); // could poss not require this and create custom..
+// could poss not require this and create custom..
+var RendererProxy = require( '../../core/RendererProxy' );
+var RendererPool  = require( '../../core/RendererPool' );
 
-var getExpected = function( layoutMethod, dataItems ){
+var getExpected = function( layout, dataItems ){
 
-	var defaultOpts = layoutMethod.defaultOpts;
+	var defaultOpts = layout.opts;
 
 	if( !defaultOpts ){
 		throw Error( 'No default opts defined on layout method.' );
 	}
 
-	var proxy = new Proxy();
+	var proxy = new RendererProxy();
+	var pool  = new RendererPool();
 
 	var data = [];
 	var sizes = [];
 	var positions = [];
 
-	var obj, prevObj, dat;
+	var prevObj = null;
+	var obj, dat;
 	var point = {};
 	var bounds = {};
 
 	for( var i = 0; i<dataItems.length; i++ ){
 
 		dat = dataItems[i];
-		obj = proxy.create();
+		obj = pool.create();
 
-		layoutMethod( i, dat, obj, prevObj, proxy, defaultOpts );
+		layout.layout( i, dat, obj, prevObj, proxy, defaultOpts );
 
 		proxy.position_get( obj, point );
 		proxy.size_get( obj, bounds );

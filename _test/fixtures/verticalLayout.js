@@ -1,11 +1,9 @@
 
-var VerticalLayout = require( '../../layouts/Vertical' );
+var VerticalLayout = require( '@jux/layouts/Vertical' );
 
 module.exports = function verticalLayout(){
 
-	var data = [0,1,2,3,4,5,6,7,8,9].map( function(i){
-		return { num: i };
-	});
+	var data = require( './data' )();
 
 	var layout = new VerticalLayout( data ,{
 		itemWidth: 100,

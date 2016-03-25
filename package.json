@@ -7,7 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "link": ""
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
   },
   "homepage": "https://github.com/jamieowen/jux#readme",
   "devDependencies": {
+    "object-assign": "^4.0.1",
     "require-dir": "^0.3.0",
     "tape": "^4.5.1"
   },

@@ -17,28 +17,29 @@ var Layout = function( data, opts, config, layoutMethod ){
 	// TODO : For ease of use - may be only ask for axis config..
 	// Or default 2 'xy' BinarySearch
 
-	if( !config.axis || !config.proxy || config.indexer ){
+	if( !config.axis || !config.proxy || !config.indexer || !config.pool ){
 		throw new Error( 'Missing configuration arguments for Layout.' );
 	}
 
 	this.needsLayoutUpdate = true;
 	this.needsIndexerUpdate = true;
 
-	this.onOptsChanged = this.onOptsChanged.bind(this);
 	this.opts = ObservableOpts( opts );
 	this.opts.onChanged.add( function(){
 		this.needsLayoutUpdate = true;
 	}.bind(this) );
 
 	this._data 	 = data;
+
 	this.axis    = config.axis;
 	this.proxy   = config.proxy;
 	this.indexer = config.indexer;
+	this.pool	 = config.pool;
+
 	this.layout  = layoutMethod;
 
-
-	//this._proxy = config.proxy || new DefaultProxy();
-	//this._indexer = config.indexer || new DefaultIndexer(1);
+	//this.proxy = config.proxy || new DefaultProxy();
+	//this.indexer = config.indexer || new DefaultIndexer(1);
 	//this._dataIsRenderer = optsOrLayout.dataIsRenderer === undefined ? false : optsOrLayout.dataIsRenderer;
 
 	this.bounds = new Bounds();
@@ -80,15 +81,12 @@ Layout.prototype = {
 			for( i = 0; i<this._data.length; i++ ){
 
 				data = this._data[i];
-				//if( this._dataIsRenderer ){
-				//	obj = data;
-				//}else{
-					obj = this._proxy.create( data );
-					this._proxy.data_set( obj, data );
-				//}
 
-				this._layout( i, data, obj, prevObj, this._proxy, this.opts );
-				this._proxy.bounds_get( obj, bounds );
+				obj = this.pool.create( data );
+				this.proxy.data_set( obj, data );
+
+				this.layout( i, data, obj, prevObj, this.proxy, this.opts );
+				this.proxy.bounds_get( obj, bounds );
 
 				// bounds expand() ?
 				this.bounds.x = Math.min( bounds.left, this.bounds.left );
@@ -106,14 +104,14 @@ Layout.prototype = {
 
 		if( this.needsIndexerUpdate ){
 			this.needsIndexerUpdate = false;
-			this._indexer.index( this.objects, this._proxy )
+			this.indexer.index( this.objects, this.proxy )
 		}
 
 	},
 
 	find: function( viewBounds, results ){
 
-		return this._indexer.find( viewBounds, this._proxy, results );
+		return this.indexer.find( viewBounds, this.proxy, results );
 
 	},
 
