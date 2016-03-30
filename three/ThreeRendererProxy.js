@@ -29,6 +29,14 @@ var ThreeRendererProxy = RendererProxy.extend( {
 		
 	},
 
+	child_add: function( threeContainer, threeObj ){
+		threeContainer.add( threeObj );
+	},
+
+	child_remove: function( threeContainer, threeObj ){
+		threeContainer.remove( threeObj );
+	},
+
 	position_get: function( threeObj, point ){
 		point.x = threeObj.position.x;
 		point.y = threeObj.position.y;

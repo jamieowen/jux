@@ -1,15 +1,31 @@
 
 var Bounds = require( './bounds/Bounds' );
 
-var View = function( layout, proxy, container ){
+var View = function( layout, config ){
 
+	if( !layout || !config ){
+		throw new Error( 'All arguments for Views must be specified' );
+	}
 
-	this._layout 	= layout || null;
-	this._proxy 	= proxy || null;
-	this._container = container || null;
-	this._viewport 	= new Bounds();
+	if( !config.pool || !config.proxy || !config.container ){
+		throw new Error( 'Missing configuration arguments for View.' );
+	}
 
 	this.needsUpdate = true;
+
+	this.layout 	 = layout;
+	this.container   = config.container;
+	this.proxy 		 = config.proxy;
+	this.pool		 = config.pool;
+
+	this._viewport	 = new Bounds();
+
+	this.margin = {
+		left: 0,
+		top: 0,
+		right: 0,
+		bottom: 0
+	};
 
 	this.visibleData 	  = [];
 	this.visibleRenderers = [];
@@ -41,9 +57,33 @@ View.prototype = {
 			this.needsUpdate = false;
 
 			this.visibleData.splice(0);
+			this.layout.find( this._viewport, this.visibleData );
 
-			var result = this.layout.find( this._viewport, this.visibleData );
+			console.log( 'UPDATE VIEW :', this.visibleData );
 
+			var renderer,layoutItem,data;
+
+			var layoutProxy = this.layout.proxy;
+			var rendererProxy = this.proxy;
+			var container = this.container;
+
+			for( var i = 0; i<this.visibleData.length; i++ ){
+
+				layoutItem = this.visibleData[i];
+
+				data = layoutProxy.data_get( layoutItem );
+				layoutProxy.position_get( layoutItem, helperPoint );
+				layoutProxy.size_get( layoutItem, helperSize );
+
+				renderer = this.pool.create(data);
+				rendererProxy.data_set( renderer, data );
+				rendererProxy.position_set( renderer, helperPoint.x, helperPoint.y );
+				rendererProxy.size_set( renderer, helperSize.width, helperSize.height );
+
+				rendererProxy.child_add( container, renderer );
+
+			}
+			/**
 			var newIdx = result.idx;
 			// adjust creation index base on index returned from find() method.
 
@@ -91,45 +131,10 @@ View.prototype = {
 			for( i = rendererIndex; i<this._rendererPool.length; i++ ){
 				renderer = this._rendererPool[i];
 				this.proxy.remove( renderer, this.container );
-			}
+			}**/
 
 		}
 
 	}
 
 };
-
-Object.defineProperties( View.prototype, {
-
-	layout: {
-		get: function(){
-			return this._layout
-		},
-		set: function( layout ){
-			if( layout === layout ){
-				return;
-			}
-			this._layout = layout;
-			this.needsUpdate = true;
-		}
-	},
-
-	proxy: {
-		get: function(){
-			return this._proxy
-		},
-		set: function( proxy ){
-			if( proxy === proxy ){
-				return;
-			}
-			this._proxy = proxy;
-			this.needsUpdate = true;
-		}
-	},	
-
-	viewport: {
-		get: function(){
-			return this._viewport
-		}
-	}	
-});

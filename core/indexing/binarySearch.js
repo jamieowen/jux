@@ -8,11 +8,24 @@ var BinarySearch = function( axis ){
 
 module.exports = BinarySearch;
 
+var sortX = function( obj, proxy ){
+
+
+};
+
 BinarySearch.prototype = {
 
 	index: function( objects, proxy ){
 		this.clear();
 		this.objects = objects;
+
+		var time = performance.now();
+		this.objects.sort( function( a, b ){
+			return proxy.x_get( a ) - proxy.x_get( b );
+		} );
+
+		var now = performance.now();
+		console.log( 'SORT TIME : ', ( now - time ) );
 	},
 
 	find: function( viewBounds, proxy, results ){
