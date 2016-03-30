@@ -6,6 +6,7 @@ var RendererProxy = function(){
 };
 
 
+RendererProxy.createExtends = createExtends;
 RendererProxy.extend = createExtends( RendererProxy );
 module.exports = RendererProxy;
 
@@ -18,8 +19,8 @@ RendererProxy.prototype = {
 		return obj.data;
 	},
 
-	data_set: function( bounds, data ){
-		bounds.data = data;
+	data_set: function( obj, data ){
+		obj.data = data;
 	},
 
 	bounds_get: function( obj, bounds ){

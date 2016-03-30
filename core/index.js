@@ -4,6 +4,7 @@ module.exports = {
 	Layout: require( './Layout' ),
 	View: require( './View' ),
 	RendererPool: require( './RendererPool' ),
-	RendererProxy: require( './RendererProxy' )
+	RendererProxy: require( './RendererProxy' ),
+	BinarySearch: require( './indexing/BinarySearch' )
 
 };

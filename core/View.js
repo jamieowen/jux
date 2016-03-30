@@ -1,7 +1,7 @@
 
 var Bounds = require( './bounds/Bounds' );
 
-var Renderer = function( layout, proxy, container ){
+var View = function( layout, proxy, container ){
 
 
 	this._layout 	= layout || null;
@@ -18,11 +18,11 @@ var Renderer = function( layout, proxy, container ){
 var helperPoint = { x: 0, y: 0 };
 var helperSize  = { width: 0, height: 0 };
 
-module.exports = Renderer;
+module.exports = View;
 
-Renderer.prototype = {
+View.prototype = {
 
-	constructor: Renderer,
+	constructor: View,
 
 	viewport: function( x, y, width, height ){
 		
@@ -34,7 +34,7 @@ Renderer.prototype = {
 		this.needsUpdate = true;
 	},
 
-	render: function(){
+	update: function(){
 
 		if( this.needsUpdate ){
 
@@ -83,7 +83,7 @@ Renderer.prototype = {
 				this.proxy.position_set( renderer, helperPoint.x, helperPoint.y );
 
 
-				this.proxy.size_set( rendeer, size.width, size.height );
+				this.proxy.size_set( renderer, size.width, size.height );
 
 			}
 
@@ -99,7 +99,7 @@ Renderer.prototype = {
 
 };
 
-Object.defineProperties( Renderer.prototype, {
+Object.defineProperties( View.prototype, {
 
 	layout: {
 		get: function(){

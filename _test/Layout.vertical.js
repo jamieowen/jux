@@ -18,7 +18,6 @@ test( 'Layout Vertical.', function( t ){
 	var h = layout.opts.itemHeight;
 	var s = layout.opts.itemSpacing;
 
-
 	// Prepare expected results
 	var expected = getExpected( layout, data );
 	var expectedBounds = [
