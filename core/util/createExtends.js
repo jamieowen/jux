@@ -1,9 +1,9 @@
 
 var createExtends = function( BaseClass ){
 
-	return function( overrides, name, createNow ) {
+	return function( overrides, name, create ) {
 
-		createNow = createNow === undefined ? true : createNow;
+		create = create === undefined ? true : create;
 
 		if( !name ){
 			name = 'Extended' + BaseClass.name;
@@ -21,7 +21,7 @@ var createExtends = function( BaseClass ){
 			Constructor.prototype[key] = overrides[key];
 		}
 
-		if (createNow) {
+		if (create) {
 			return new Constructor();
 		} else {
 			return Constructor;

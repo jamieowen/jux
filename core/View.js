@@ -59,8 +59,6 @@ View.prototype = {
 			this.visibleData.splice(0);
 			this.layout.find( this._viewport, this.visibleData );
 
-			console.log( 'UPDATE VIEW :', this.visibleData );
-
 			var renderer,layoutItem,data;
 
 			var layoutProxy = this.layout.proxy;
@@ -75,7 +73,7 @@ View.prototype = {
 				layoutProxy.position_get( layoutItem, helperPoint );
 				layoutProxy.size_get( layoutItem, helperSize );
 
-				renderer = this.pool.create(data);
+				renderer = this.pool.get(data);
 				rendererProxy.data_set( renderer, data );
 				rendererProxy.position_set( renderer, helperPoint.x, helperPoint.y );
 				rendererProxy.size_set( renderer, helperSize.width, helperSize.height );

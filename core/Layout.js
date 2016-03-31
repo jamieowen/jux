@@ -82,7 +82,7 @@ Layout.prototype = {
 
 				data = this._data[i];
 
-				obj = this.pool.create( data );
+				obj = this.pool.get( data );
 				this.proxy.data_set( obj, data );
 
 				this.layout( i, data, obj, prevObj, this.proxy, this.opts );
