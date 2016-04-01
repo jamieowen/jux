@@ -6,8 +6,9 @@ var WeakMap			= require( 'weak-map' );
 
 var RendererPool = function(){
 
-	this.onCreate = new Signal();
-	this.onFree   = new Signal();
+	this.onRevive  = new Signal();
+	this.onCreate  = new Signal();
+	this.onRelease = new Signal();
 
 	this.maxSize = 100;
 	this.pool 	 = [];
@@ -41,7 +42,15 @@ RendererPool.prototype = {
 
 		var object = this.map.get( data );
 		if( !object ){
-			object = this.create(data);
+
+			if( this.pool.length ){
+				object = this.pool.shift();
+				this.onRevive.dispatch( object,data );
+			}else{
+				object = this.create(data);
+				this.onCreate.dispatch( object,data );
+			}
+
 			this.map.set( data, object );
 		}
 		return object;
@@ -54,6 +63,10 @@ RendererPool.prototype = {
 		if( pooled ){
 			this.map.delete( data );
 			this.pool.push( pooled );
+			this.onRelease.dispatch( pooled, data );
+			return pooled;
+		}else{
+			return null;
 		}
 	},
 

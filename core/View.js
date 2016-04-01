@@ -29,10 +29,11 @@ var View = function( layout, config ){
 
 	this.visibleData 	  = [];
 	this.visibleRenderers = [];
+	this.results 		  = [];
 };
 
-var helperPoint = { x: 0, y: 0 };
-var helperSize  = { width: 0, height: 0 };
+var helperPoint 	= { x: 0, y: 0 };
+var helperSize  	= { width: 0, height: 0 };
 
 module.exports = View;
 
@@ -56,20 +57,21 @@ View.prototype = {
 
 			this.needsUpdate = false;
 
-			this.visibleData.splice(0);
-			this.layout.find( this._viewport, this.visibleData );
+			var previousData = this.visibleData.splice(0);
+			this.layout.find( this._viewport, this.results );
 
-			var renderer,layoutItem,data;
+			var renderer,layoutItem,data,previousIdx;
 
 			var layoutProxy = this.layout.proxy;
 			var rendererProxy = this.proxy;
 			var container = this.container;
 
-			for( var i = 0; i<this.visibleData.length; i++ ){
+			while( this.results.length ){
 
-				layoutItem = this.visibleData[i];
-
+				layoutItem = this.results.shift();
 				data = layoutProxy.data_get( layoutItem );
+
+				// create renderer and position.
 				layoutProxy.position_get( layoutItem, helperPoint );
 				layoutProxy.size_get( layoutItem, helperSize );
 
@@ -78,58 +80,31 @@ View.prototype = {
 				rendererProxy.position_set( renderer, helperPoint.x, helperPoint.y );
 				rendererProxy.size_set( renderer, helperSize.width, helperSize.height );
 
-				rendererProxy.child_add( container, renderer );
+				// check if the renderer has already been added.
+				// if it has remove it from previousData
+				// it will be removed from container below.
 
-			}
-			/**
-			var newIdx = result.idx;
-			// adjust creation index base on index returned from find() method.
+				previousIdx = previousData.indexOf( data );
 
-			var rendererIndex = 0;
-			var data,renderer;
-
-			for( var i = 0; i<this.visibleData.length; i++ ){
-
-				data = this.visibleData[i];
-
-				if( this.layout._dataIsRenderer ){
-					renderer = data;
+				if( previousIdx >= 0 ){
+					previousData.splice( previousIdx,1 );
 				}else{
-					renderer = this._proxy.create( data );
-
-					// layout find should return startIndex as well as data items?
-					// this way we can auto  pool renderers when they change.
-
-					renderer = this._rendererPool[rendererIndex];
-					if( !renderer ){
-						renderer = this.proxy.create( data );
-						this._rendererPool.push( renderer );
-					}
-
-					this.proxy.data_set( renderer, data );
+					rendererProxy.child_add( container, renderer );
 				}
 
-				this.proxy.add( renderer, this.container );
-
-				this._layout._proxy.position_get( data, helperPoint );
-				this._layout._proxy.size_get( data, helperSize );
-
-				helperPoint.x -= this._viewport.x;
-				helperPoint.y -= this._viewport.y;
-
-				// should probably change proxy set to use an object.
-				this.proxy.position_set( renderer, helperPoint.x, helperPoint.y );
-
-
-				this.proxy.size_set( renderer, size.width, size.height );
+				this.visibleData.push( data );
 
 			}
 
-			// free up renderers
-			for( i = rendererIndex; i<this._rendererPool.length; i++ ){
-				renderer = this._rendererPool[i];
-				this.proxy.remove( renderer, this.container );
-			}**/
+			// remove old renderers.
+			for( var i = 0; i<previousData.length; i++ ){
+
+				data = previousData[i];
+				renderer = this.pool.release( data );
+				rendererProxy.data_set( renderer,null );
+				rendererProxy.child_remove( container, renderer );
+
+			}
 
 		}
 
