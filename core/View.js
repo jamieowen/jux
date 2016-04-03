@@ -66,6 +66,8 @@ View.prototype = {
 			var rendererProxy = this.proxy;
 			var container = this.container;
 
+			var lastLength = this.results.length;
+
 			while( this.results.length ){
 
 				layoutItem = this.results.shift();
@@ -75,7 +77,7 @@ View.prototype = {
 				layoutProxy.position_get( layoutItem, helperPoint );
 				layoutProxy.size_get( layoutItem, helperSize );
 
-				renderer = this.pool.get(data);
+				renderer = this.pool.get( layoutItem );
 				rendererProxy.data_set( renderer, data );
 				rendererProxy.position_set( renderer,
 					helperPoint.x - this._viewport.x,
@@ -87,7 +89,7 @@ View.prototype = {
 				// if it has remove it from previousData
 				// it will be removed from container below.
 
-				previousIdx = previousData.indexOf( data );
+				previousIdx = previousData.indexOf( layoutItem );
 
 				if( previousIdx >= 0 ){
 					previousData.splice( previousIdx,1 );
@@ -95,15 +97,17 @@ View.prototype = {
 					rendererProxy.child_add( container, renderer );
 				}
 
-				this.visibleData.push( data );
+				this.visibleData.push( layoutItem );
 
 			}
+
+			console.log( 'UPDATE :', lastLength, this.visibleData.length, previousData.length );
 
 			// remove old renderers.
 			for( var i = 0; i<previousData.length; i++ ){
 
-				data = previousData[i];
-				renderer = this.pool.release( data );
+				layoutItem = previousData[i];
+				renderer = this.pool.release( layoutItem );
 				rendererProxy.data_set( renderer,null );
 				rendererProxy.child_remove( container, renderer );
 
