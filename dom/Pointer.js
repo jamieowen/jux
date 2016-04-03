@@ -33,6 +33,9 @@ pointer.onUp.add( function(){
 
 **/
 
+// QUESTIONS ---
+// 1. Move event should probably always be dispatched?
+
 /**
  * Generic pointer utility to attach to all usable
  * mouse and touch events on an element.
@@ -94,27 +97,64 @@ Pointer.Press = function PointerPress( target ){
 };
 Pointer.Press = Object.create( Pointer.prototype );
 
+var getOffset = function( ev, target ){
+
+	if( ev.offsetX && ev.offsetY ){
+		return {
+			x: ev.offsetX,
+			y: ev.offsetY
+		};
+	}else{
+
+		var bounds = getBoundingClientRect(target);
+		return {
+			x: ev.clientX - bounds.left,
+			y: ev.clientY - bounds.top
+		}
+	}
+};
+
+var topLeft = { left: 0, top: 0 };
+var getBoundingClientRect = function( target ){
+	if (target === window ||
+		target === document ||
+		target === document.body) {
+		return topLeft;
+	} else {
+		return target.getBoundingClientRect()
+	}
+};
+
 Pointer.prototype.onEvent = function( ev ){
 
 	switch( ev.type ){
 
+		case 'click':
+			this.emit( Pointer.EVENT.CLICK );
+			break;
+
 		case 'mousedown':
 		case 'touchstart':
+			this.down = true;
 			this.emit( Pointer.EVENT.DOWN );
 			break;
 
 		case 'mouseup':
 		case 'touchend':
+		case 'touchcancel':
+			this.down = false;
 			this.emit( Pointer.EVENT.UP );
 			break;
 
 		case 'mousemove':
 		case 'touchmove':
-			this.emit( Pointer.EVENT.MOVE );
+
+			if( this.down ){
+				this.emit( Pointer.EVENT.MOVE, ev.clientX, ev.clientY, ev.offsetX, ev.offsetY );
+			}
+
 			break;
 
-		case 'click':
-			this.emit( Pointer.EVENT.CLICK );
 
 	}
 
@@ -145,6 +185,26 @@ Pointer.prototype.enable = function(){
 };
 
 Pointer.prototype.disable = function(){
+
+	if( this._enabled ){
+
+		var opts = this._opts;
+		var listeners = [];
+		if( opts.mode === 'mouse' || opts.mode === 'both' ){
+			listeners.push( 'mouseup', 'mousedown', 'mousemove' );
+		}
+		if( opts.mode === 'touch' || opts.mode === 'both' ){
+			listeners.push( 'touchstart', 'touchend', 'touchmove', 'touchcancel' );
+		}
+
+		var target = this.target;
+		listeners.forEach( function( type ){
+			target.removeEventListener( type, this.onEvent )
+		}.bind(this));
+
+		this._enabled = false;
+
+	}
 
 };
 
