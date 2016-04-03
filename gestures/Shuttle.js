@@ -1,0 +1,5 @@
+
+var JogWheel = function(){
+
+	
+};
