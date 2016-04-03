@@ -82,6 +82,7 @@ Pointer.EVENT = {
 	TRIGGER: 'trigger'
 };
 
+/**
 // Some additional class types to simplify setup.
 Pointer.Touch = function PointerTouch( target ){
 	Pointer.call( this, target, {
@@ -96,6 +97,7 @@ Pointer.Press = function PointerPress( target ){
 	})
 };
 Pointer.Press = Object.create( Pointer.prototype );
+**/
 
 var getOffset = function( ev, target ){
 
@@ -114,6 +116,7 @@ var getOffset = function( ev, target ){
 	}
 };
 
+
 var topLeft = { left: 0, top: 0 };
 var getBoundingClientRect = function( target ){
 	if (target === window ||
@@ -125,33 +128,51 @@ var getBoundingClientRect = function( target ){
 	}
 };
 
+
 Pointer.prototype.onEvent = function( ev ){
+
+	ev.preventDefault();
+
+	var infoEv = ev;
+	if( ev.changedTouches ){
+		infoEv = ev.changedTouches[0];
+	}
+
+	var offset = getOffset( infoEv,this.target );
+	var event = {
+		originalEvent: ev,
+		clientX: infoEv.clientX,
+		clientY: infoEv.clientY,
+		offsetX: offset.x,
+		offsetY: offset.y
+	};
 
 	switch( ev.type ){
 
 		case 'click':
-			this.emit( Pointer.EVENT.CLICK );
+			this.emit( Pointer.EVENT.CLICK,event );
 			break;
 
 		case 'mousedown':
 		case 'touchstart':
+
 			this.down = true;
-			this.emit( Pointer.EVENT.DOWN );
+			this.emit( Pointer.EVENT.DOWN,event );
 			break;
 
 		case 'mouseup':
 		case 'touchend':
 		case 'touchcancel':
 			this.down = false;
-			this.emit( Pointer.EVENT.UP );
+			this.emit( Pointer.EVENT.UP,event );
 			break;
 
 		case 'mousemove':
 		case 'touchmove':
 
-			if( this.down ){
-				this.emit( Pointer.EVENT.MOVE, ev.clientX, ev.clientY, ev.offsetX, ev.offsetY );
-			}
+			//if( this.down ){
+				this.emit( Pointer.EVENT.MOVE,event );
+			//}
 
 			break;
 
@@ -160,19 +181,24 @@ Pointer.prototype.onEvent = function( ev ){
 
 };
 
+function getListeners( opts ){
+
+	var listeners = [];
+	if( opts.mode === 'mouse' || opts.mode === 'both' ){
+		listeners.push( 'mouseup', 'mousedown', 'mousemove' );
+	}
+	if( opts.mode === 'touch' || opts.mode === 'both' ){
+		listeners.push( 'touchstart', 'touchend', 'touchmove', 'touchcancel' );
+	}
+	return listeners;
+
+}
+
 Pointer.prototype.enable = function(){
 
 	if( !this._enabled ){
 
-		var opts = this._opts;
-		var listeners = [];
-		if( opts.mode === 'mouse' || opts.mode === 'both' ){
-			listeners.push( 'mouseup', 'mousedown', 'mousemove' );
-		}
-		if( opts.mode === 'touch' || opts.mode === 'both' ){
-			listeners.push( 'touchstart', 'touchend', 'touchmove', 'touchcancel' );
-		}
-
+		var listeners = getListeners( this._opts );
 		var target = this.target;
 		listeners.forEach( function( type ){
 			target.addEventListener( type, this.onEvent )
@@ -184,19 +210,12 @@ Pointer.prototype.enable = function(){
 
 };
 
+
 Pointer.prototype.disable = function(){
 
 	if( this._enabled ){
 
-		var opts = this._opts;
-		var listeners = [];
-		if( opts.mode === 'mouse' || opts.mode === 'both' ){
-			listeners.push( 'mouseup', 'mousedown', 'mousemove' );
-		}
-		if( opts.mode === 'touch' || opts.mode === 'both' ){
-			listeners.push( 'touchstart', 'touchend', 'touchmove', 'touchcancel' );
-		}
-
+		var listeners = getListeners( this._opts );
 		var target = this.target;
 		listeners.forEach( function( type ){
 			target.removeEventListener( type, this.onEvent )

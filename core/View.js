@@ -77,7 +77,10 @@ View.prototype = {
 
 				renderer = this.pool.get(data);
 				rendererProxy.data_set( renderer, data );
-				rendererProxy.position_set( renderer, helperPoint.x, helperPoint.y );
+				rendererProxy.position_set( renderer,
+					helperPoint.x - this._viewport.x,
+					helperPoint.y - this._viewport.y
+				);
 				rendererProxy.size_set( renderer, helperSize.width, helperSize.height );
 
 				// check if the renderer has already been added.
