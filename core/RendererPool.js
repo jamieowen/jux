@@ -16,7 +16,7 @@ var RendererPool = function(){
 
 };
 
-
+RendererPool.createExtends = createExtends;
 RendererPool.extend = createExtends( RendererPool );
 module.exports = RendererPool;
 
