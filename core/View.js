@@ -101,7 +101,7 @@ View.prototype = {
 
 			}
 
-			console.log( 'UPDATE :', lastLength, this.visibleData.length, previousData.length );
+			//console.log( 'UPDATE :', lastLength, this.visibleData.length, previousData.length );
 
 			// remove old renderers.
 			for( var i = 0; i<previousData.length; i++ ){
