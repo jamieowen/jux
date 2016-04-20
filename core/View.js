@@ -57,6 +57,7 @@ View.prototype = {
 
 			this.needsUpdate = false;
 
+			this.visibleRenderers.splice(0);
 			var previousData = this.visibleData.splice(0);
 			this.layout.find( this._viewport, this.results );
 
@@ -98,9 +99,11 @@ View.prototype = {
 				}
 
 				this.visibleData.push( layoutItem );
+				this.visibleRenderers.push( renderer );
 
 			}
 
+			//console.log( 'update view' );
 			//console.log( 'UPDATE :', lastLength, this.visibleData.length, previousData.length );
 
 			// remove old renderers.

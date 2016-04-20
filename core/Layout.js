@@ -5,6 +5,9 @@ var objectAssign   = require( 'object-assign' );
 var ObservableOpts = require( './util/ObservableOpts' );
 var Bounds 		   = require( './bounds/Bounds');
 
+var RendererPool   = require( './RendererPool' );
+var RendererProxy  = require( './RendererProxy' );
+
 var boundsHelper = new Bounds();
 
 
@@ -17,7 +20,7 @@ var Layout = function( data, opts, config, layoutMethod ){
 	// TODO : For ease of use - may be only ask for axis config..
 	// Or default 2 'xy' BinarySearch
 
-	if( !config.axis || !config.proxy || !config.indexer || !config.pool ){
+	if( !config.axis || !config.indexer ){
 		throw new Error( 'Missing configuration arguments for Layout.' );
 	}
 
@@ -32,9 +35,9 @@ var Layout = function( data, opts, config, layoutMethod ){
 	this._data 	 = data;
 
 	this.axis    = config.axis;
-	this.proxy   = config.proxy;
 	this.indexer = config.indexer;
-	this.pool	 = config.pool;
+	this.proxy   = config.proxy || new RendererProxy();
+	this.pool	 = config.pool || new RendererPool();
 
 	this.layout  = layoutMethod;
 

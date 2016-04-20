@@ -10,7 +10,7 @@ var ScrollerAxis = function(){
     this.max = 0;
     this.viewSize = 0;
 
-	this.maxSpeed = 50;
+	this.maxSpeed = 10000;
     this.speed = 0;
     this.friction = 0.9655;
 

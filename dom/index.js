@@ -1,8 +1,8 @@
 
 module.exports = {
 
-	RendererPool: require( './RendererPool' ),
-	RendererProxy: require( './RendererProxy' ),
+	Pool: require( './Pool' ),
+	Proxy: require( './Proxy' ),
 	Pointer: require( './Pointer' )
 
 };
