@@ -1,5 +1,5 @@
 
-var JogWheel = function(){
+var Shuttle = function(){
 
 	
 };
