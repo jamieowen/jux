@@ -116,6 +116,55 @@ Scroller.prototype.pointerMove = function( x,y,z ) {
 
 };
 
+
+Scroller.prototype._boundPointer = undefined;
+
+
+Scroller.prototype.bindPointer = function( pointer ){
+
+	if( this._boundPointer ){
+		return;
+	}
+
+	var swipe = this;
+	this._boundPointer = {
+		pointer: pointer,
+		onMove: function( ev ){
+			this.pointerMove( ev.offsetX, ev.offsetY );
+		}.bind(swipe),
+		onDown: function( ev ){
+			this.pointerDown( ev.offsetX, ev.offsetY );
+		}.bind(swipe),
+		onUp: function( ev ){
+			this.pointerUp( ev.offsetX, ev.offsetY );
+		}.bind(swipe)
+	};
+
+	// need to look at referencing constants for event types
+	pointer.on( 'move', this._boundPointer.onMove );
+	pointer.on( 'down', this._boundPointer.onDown );
+	pointer.on( 'up', this._boundPointer.onUp );
+
+};
+
+
+Scroller.prototype.unbindPointer = function(){
+
+	if( this._boundPointer ){
+
+		var pointer = this._boundPointer.pointer;
+
+		pointer.off( 'move', this._boundPointer.onMove );
+		pointer.off( 'down', this._boundPointer.onDown );
+		pointer.off( 'up', this._boundPointer.onUp );
+
+		this._boundPointer = undefined;
+
+	}
+
+};
+
+
 Scroller.prototype._setPosition = function( x, y, z ){
 
 	this.previous[0] = this.position[0];
@@ -263,17 +312,4 @@ Scroller.prototype.getPosition = function( axis ){
 		return NaN;
 	}
 };
-
-
-
-Scroller.prototype.dispose = function(){
-
-	//this.pointerEvents.off( 'pointer-up', this._onPointer );
-	//this.pointerEvents.off( 'pointer-down', this._onPointer );
-	//this.pointerEvents.off( 'pointer-move', this._onPointer );
-};
-
-
-
-
 
