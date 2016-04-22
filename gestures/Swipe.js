@@ -147,28 +147,6 @@ Swipe.prototype.pointerMove = function( x, y ){
 				this.swipeBegan = true;
 
 			}
-			/**
-			// calculate
-			if( Math.abs(distance) > this.distanceMin ){
-
-				if( vx > 0 ){
-					this.swipeDirection = Swipe.DIRECTION.LEFT;
-				}else
-				if( vx < 0 ){
-					this.swipeDirection = Swipe.DIRECTION.RIGHT;
-				}else
-				if( vy > 0 ){
-					this.swipeDirection = Swipe.DIRECTION.UP;
-				}else
-				if( vy < 0 ){
-					this.swipeDirection = Swipe.DIRECTION.DOWN;
-				}
-
-				this.swipeDistance = calcSwipeDistance( vx, this.distanceMin );
-				this.emit( Swipe.EVENTS.START, Swipe.EVENTS.START, this.swipeDirection, this.swipeDistance );
-				this.swipeBegan = true;
-
-			}**/
 
 		}else{
 

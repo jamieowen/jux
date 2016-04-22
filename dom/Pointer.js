@@ -131,7 +131,7 @@ var getBoundingClientRect = function( target ){
 
 Pointer.prototype.onEvent = function( ev ){
 
-	ev.preventDefault();
+	//ev.preventDefault();
 
 	var infoEv = ev;
 	if( ev.changedTouches ){
@@ -190,6 +190,9 @@ function getListeners( opts ){
 	if( opts.mode === 'touch' || opts.mode === 'both' ){
 		listeners.push( 'touchstart', 'touchend', 'touchmove', 'touchcancel' );
 	}
+
+	listeners.push( 'click' );
+	console.log( 'ADD' );
 	return listeners;
 
 }

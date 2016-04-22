@@ -27,14 +27,16 @@ RendererPool.prototype = {
 
 	types: function(){
 		return 0;
+		// Not sure about this...
+		// Probably create a TypedPool
 	},
 
 	createByType: function( data ){
-
+		// Not sure about this...
+		// Probably create a TypedPool
 	},
 
 	create: function( data ) {
-
 		return new Bounds();
 	},
 

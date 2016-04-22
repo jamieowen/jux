@@ -1,5 +1,6 @@
 
 var Bounds = require( './bounds/Bounds' );
+var ObservableOpts = require( './util/ObservableOpts' );
 
 var View = function( layout, config ){
 
@@ -20,12 +21,16 @@ var View = function( layout, config ){
 
 	this._viewport	 = new Bounds();
 
-	this.margin = {
+	this.margin = new ObservableOpts( {
 		left: 0,
 		top: 0,
 		right: 0,
 		bottom: 0
-	};
+	} );
+
+	this.margin.onChanged.add( function(){
+		this.needsUpdate = true;
+	}.bind(this) );
 
 	this.visibleData 	  = [];
 	this.visibleRenderers = [];
@@ -34,6 +39,7 @@ var View = function( layout, config ){
 
 var helperPoint 	= { x: 0, y: 0 };
 var helperSize  	= { width: 0, height: 0 };
+var helperViewport  = new Bounds();
 
 module.exports = View;
 
@@ -59,7 +65,14 @@ View.prototype = {
 
 			this.visibleRenderers.splice(0);
 			var previousData = this.visibleData.splice(0);
-			this.layout.find( this._viewport, this.results );
+
+			helperViewport.x = this._viewport.x - this.margin.left;
+			helperViewport.y = this._viewport.y - this.margin.top;
+
+			helperViewport.width = this._viewport.width + this.margin.right + this.margin.left;
+			helperViewport.height = this._viewport.height + this.margin.bottom + this.margin.top;
+
+			this.layout.find( helperViewport, this.results );
 
 			var renderer,layoutItem,data,previousIdx;
 
@@ -67,7 +80,8 @@ View.prototype = {
 			var rendererProxy = this.proxy;
 			var container = this.container;
 
-			var lastLength = this.results.length;
+			//var lastLength = this.results.length;
+
 
 			while( this.results.length ){
 
@@ -81,8 +95,8 @@ View.prototype = {
 				renderer = this.pool.get( layoutItem );
 				rendererProxy.data_set( renderer, data );
 				rendererProxy.position_set( renderer,
-					helperPoint.x - this._viewport.x,
-					helperPoint.y - this._viewport.y
+					helperPoint.x - helperViewport.x - this.margin.left,
+					helperPoint.y - helperViewport.y - this.margin.top
 				);
 				rendererProxy.size_set( renderer, helperSize.width, helperSize.height );
 
