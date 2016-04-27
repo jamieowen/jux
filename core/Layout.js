@@ -65,6 +65,7 @@ var Layout = function( data, opts, config, layoutMethod ){
 
 module.exports = Layout;
 
+
 Layout.prototype = {
 
 	update: function(){
@@ -85,7 +86,11 @@ Layout.prototype = {
 
 				data = this._data[i];
 
-				obj = this.pool.get( data );
+				// Need to look into multiple same data objects
+				// here..Bounds - should just be regular pool
+				// with no association to data object.
+
+				obj = this.pool.create(data);//this.pool.get( data );
 				this.proxy.data_set( obj, data );
 
 				this.layout( i, data, obj, prevObj, this.proxy, this.opts );

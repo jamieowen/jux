@@ -19,6 +19,13 @@ var View = function( layout, config ){
 	this.proxy 		 = config.proxy;
 	this.pool		 = config.pool;
 
+
+	this.layout.onLayoutUpdated.add( function(){
+		console.log( 'LAYOUT UPDATED' );
+		this.needsUpdate = true;
+		this.layoutHasChanged = true;
+	}.bind(this));
+
 	this._viewport	 = new Bounds();
 
 	this.margin = new ObservableOpts( {
@@ -82,7 +89,6 @@ View.prototype = {
 
 			//var lastLength = this.results.length;
 
-
 			while( this.results.length ){
 
 				layoutItem = this.results.shift();
@@ -125,6 +131,7 @@ View.prototype = {
 
 				layoutItem = previousData[i];
 				renderer = this.pool.release( layoutItem );
+
 				rendererProxy.data_set( renderer,null );
 				rendererProxy.child_remove( container, renderer );
 

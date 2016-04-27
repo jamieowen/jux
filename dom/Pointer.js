@@ -131,7 +131,7 @@ var getBoundingClientRect = function( target ){
 
 Pointer.prototype.onEvent = function( ev ){
 
-	//ev.preventDefault();
+	ev.preventDefault();
 
 	var infoEv = ev;
 	if( ev.changedTouches ){
