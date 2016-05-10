@@ -4,8 +4,8 @@ var ObservableOpts = require( './util/ObservableOpts' );
 
 var View = function( layout, config ){
 
-	if( !layout || !config ){
-		throw new Error( 'All arguments for Views must be specified' );
+	if( !config ){
+		throw new Error( 'Config needs specifying' );
 	}
 
 	if( !config.pool || !config.proxy || !config.container ){
@@ -20,11 +20,16 @@ var View = function( layout, config ){
 	this.pool		 = config.pool;
 
 
-	this.layout.onLayoutUpdated.add( function(){
-		console.log( 'LAYOUT UPDATED' );
-		this.needsUpdate = true;
-		this.layoutHasChanged = true;
-	}.bind(this));
+	if( this.layout ){
+
+		this.layout.onLayoutUpdated.add( function(){
+			console.log( 'LAYOUT UPDATED' );
+			this.needsUpdate = true;
+			this.layoutHasChanged = true;
+		}.bind(this));
+
+	}
+
 
 	this._viewport	 = new Bounds();
 
@@ -66,6 +71,7 @@ View.prototype = {
 
 	update: function(){
 
+
 		if( this.needsUpdate ){
 
 			this.needsUpdate = false;
@@ -79,13 +85,16 @@ View.prototype = {
 			helperViewport.width = this._viewport.width + this.margin.right + this.margin.left;
 			helperViewport.height = this._viewport.height + this.margin.bottom + this.margin.top;
 
-			this.layout.find( helperViewport, this.results );
-
 			var renderer,layoutItem,data,previousIdx;
 
-			var layoutProxy = this.layout.proxy;
 			var rendererProxy = this.proxy;
+			var layoutProxy;
 			var container = this.container;
+
+			if( this.layout ){
+				this.layout.find( helperViewport, this.results );
+				layoutProxy = this.layout.proxy;
+			}
 
 			//var lastLength = this.results.length;
 

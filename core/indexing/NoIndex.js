@@ -21,9 +21,9 @@ NoIndex.prototype = {
 
 		var layoutItem;
 		for( var i = 0; i<this.objects.length; i++ ){
+
 			layoutItem = this.objects[i];
 			proxy.bounds_get( layoutItem, bounds );
-
 
 			if( intersects( layoutItem, viewBounds ) ){
 				//console.log( 'LO', layoutItem );

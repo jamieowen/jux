@@ -90,9 +90,12 @@ Scroller.prototype.pointerUp = function( x,y,z ){
 		return;
 	}
 
+
 	for( var i = 0; i<this.axes.length; i++ ){
-		if( this.axes[i] )
+		if( this.axes[i] ){
 			this.axes[i].stop();
+		}
+
 	}
 
 	this.down = false;
@@ -130,13 +133,13 @@ Scroller.prototype.bindPointer = function( pointer ){
 	this._boundPointer = {
 		pointer: pointer,
 		onMove: function( ev ){
-			this.pointerMove( ev.offsetX, ev.offsetY );
+			this.pointerMove( ev.clientX, ev.clientY );
 		}.bind(swipe),
 		onDown: function( ev ){
-			this.pointerDown( ev.offsetX, ev.offsetY );
+			this.pointerDown( ev.clientX, ev.clientY );
 		}.bind(swipe),
 		onUp: function( ev ){
-			this.pointerUp( ev.offsetX, ev.offsetY );
+			this.pointerUp( ev.clientX, ev.clientY );
 		}.bind(swipe)
 	};
 
@@ -174,6 +177,7 @@ Scroller.prototype._setPosition = function( x, y, z ){
 	this.position[0] = x;
 	this.position[1] = y;
 	this.position[2] = z || 0;
+
 };
 
 Scroller.prototype.triggerInteractions = function(){
@@ -220,19 +224,12 @@ Scroller.prototype.update = function( dt ){
 	for( i = 0; i<this.axes.length; i++ ){
 		axis = this.axes[i];
 		if( axis ){
-
-			changed = changed || axis.update(dt);
-
-			if( changed && axis.overshotMin ){
-				this.onOvershootMin.dispatch( i, axis.overshotNorm );
-			}else
-			if( changed && axis.overshotMax ){
-				this.onOvershootMax.dispatch( i, axis.overshotNorm );
-			}
+			changed = axis.update(dt) || changed;
 		}
 	}
 
 	if( changed ) {
+		//console.log( 'CHANGED : ', changed );
 		this.scrolling = true;
 		this.onScroll.dispatch();
 	}else{
@@ -274,7 +271,6 @@ Scroller.prototype.setMin = function( x, y, z ){
 	for( var i = 0; i<this.axes.length; i++ ){
 		if( this.axes[i] && !isNaN(arguments[i]) ){
 			this.axes[i].min = arguments[i];
-
 		}
 	}
 

@@ -64,6 +64,8 @@ var Pointer = function( target, opts ){
 	this._enabled = false;
 	this.target   = target;
 
+	this._timer = NaN;
+
 	this.onEvent = this.onEvent.bind(this);
 
 	this.enable();
@@ -156,6 +158,8 @@ Pointer.prototype.onEvent = function( ev ){
 		case 'mousedown':
 		case 'touchstart':
 
+			this._start = [ event.clientX, event.clientY ];
+			this._timer = new Date().getTime();
 			this.down = true;
 			this.emit( Pointer.EVENT.DOWN,event );
 			break;
@@ -163,8 +167,20 @@ Pointer.prototype.onEvent = function( ev ){
 		case 'mouseup':
 		case 'touchend':
 		case 'touchcancel':
+
+
 			this.down = false;
 			this.emit( Pointer.EVENT.UP,event );
+
+			var now = new Date().getTime();
+			var move = [ this._start[0] - event.clientX, this._start[1] - event.clientY ];
+
+			var distance = Math.abs( Math.sqrt( move[0] * move[0] + move[1] * move[1] ) );
+
+			if( now - this._timer < 200 && distance < 10 ){
+				this.emit( Pointer.EVENT.TAP,event );
+			}
+
 			break;
 
 		case 'mousemove':
@@ -192,7 +208,7 @@ function getListeners( opts ){
 	}
 
 	listeners.push( 'click' );
-	console.log( 'ADD' );
+
 	return listeners;
 
 }
