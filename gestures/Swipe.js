@@ -82,6 +82,8 @@ Swipe.prototype.pointerDown = function( x, y ){
 	this.reset();
 	this._start = [ x, y ];
 
+	console.log( 'SWIPE ... POINTER DOWN' );
+
 };
 
 Swipe.prototype.reset = function(){

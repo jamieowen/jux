@@ -56,10 +56,7 @@ ThreeView.prototype = {
 			pool: Jux.RendererPool.extend( {
 
 				create: function( data ){
-
-					console.log( 'CREATE' );
 					return new THREE.Mesh( scope.geometry, scope.material );
-
 				}
 
 			}),
@@ -76,7 +73,7 @@ ThreeView.prototype = {
 				},
 
 				size_set: function( threeObj, w, h ){
-
+					// no need to set here.
 				},
 
 				child_add: function( threeContainer, threeObj ){
