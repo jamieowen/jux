@@ -1,9 +1,10 @@
 
 var Jux = require( '@jux/core' );
-//var JuxThree = require( '@jux/three' );
+var Scroller = require( '@jux/scroller' );
+//var Pointer = require( '@jux/dom/Pointer' );
+var Pointer = require( '@jux/three/Pointer' );
 
 var THREE = require( 'three' );
-
 
 var ThreeView = function(){
 
@@ -40,15 +41,32 @@ ThreeView.prototype = {
 			color: 0xFF0000
 		});
 
-		this.mesh = new THREE.Mesh( this.geometry, this.material );
-		this.scene.add( this.mesh );
+		var plane = new THREE.PlaneBufferGeometry( 300,300 );
+		var mesh = new THREE.Mesh( plane, this.material );
+
+		this.interactionPlane = mesh;
+		this.scene.rotation.x = -Math.PI * 0.25;
+		this.scene.add( mesh );
 
 	},
 
 	init: function(){
 
 		var scope = this;
-		// initialise with an Empty layout.
+
+		this.scroller = new Scroller( {
+			axes: [true,true,false]
+		});
+
+		this.pointer = new Pointer(
+			this.renderer.domElement,
+			this.camera,
+			new THREE.Raycaster(),
+			this.interactionPlane
+		);
+
+		this.scroller.bindPointer( this.pointer );
+
 		this.view = new Jux.View( null, {
 
 			container: this.scene,
@@ -90,15 +108,35 @@ ThreeView.prototype = {
 
 	update: function(){
 
-		this.view.viewport(
-			0,0,
-			400,300
-		);
+		var layout = this.view.layout;
+
+		if( layout ){
+
+			this.scroller.axes[0].max = layout.bounds.width;
+			this.scroller.axes[1].max = layout.bounds.height;
+			this.scroller.axes[0].viewSize = 10;
+			this.scroller.axes[1].viewSize = 10;
+
+		}
+
+		var scrolled = this.scroller.update();
+
+		if( scrolled ){
+
+			this.view.position(
+				this.scroller.axes[0].position,
+				this.scroller.axes[1].position
+			)
+
+		}
 
 		this.view.update();
 		this.renderer.render( this.scene, this.camera );
 
-		this.camera.position.z = 500;
+		this.camera.position.z = 600;
+		this.camera.position.y = -100;
+		this.camera.position.x = -300;
+		this.camera.lookAt( this.interactionPlane.position );
 
 	},
 
@@ -108,6 +146,10 @@ ThreeView.prototype = {
 
 		this.camera.aspect = w/h;
 		this.camera.updateProjectionMatrix();
+
+		//this.view.size( 100,100 );
+		this.view.size( w,h );
+		//this.scroller.setViewSize( w,h );
 
 	},
 

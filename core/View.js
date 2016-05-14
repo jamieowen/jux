@@ -69,6 +69,24 @@ View.prototype = {
 		this.needsUpdate = true;
 	},
 
+	position: function( x, y ){
+
+		this._viewport.x = x;
+		this._viewport.y = y;
+
+		this.needsUpdate = true;
+
+	},
+
+	size: function( w, h ){
+
+		this._viewport.width = w;
+		this._viewport.height = h;
+
+		this.needsUpdate = true;
+
+	},
+
 	update: function(){
 
 

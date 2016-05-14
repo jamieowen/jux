@@ -2,30 +2,39 @@
 var objectAssign = require( 'object-assign' );
 var EventEmitter = require( 'eventemitter3' );
 
-var Swipe = function( direction, opts ){
+var vec2 = {
 
-	if( typeof direction === 'string' ){
-		this.direction = [ direction ]
-	}else{
-		this.direction = direction; // assume array
-	}
+	create: require( 'gl-vec2/create' ),
+	subtract: require( 'gl-vec2/subtract'),
+	normalize: require( 'gl-vec2/normalize' ),
+	dot: require( 'gl-vec2/dot'),
+	length: require( 'gl-vec2/length' )
+
+};
+
+var UP = [ 0,1 ];
+var DOWN = [ 0,-1 ];
+var LEFT = [ -1,0 ];
+var RIGHT = [ 1,0 ];
+
+
+var Swipe = function(){
 
 	EventEmitter.call( this );
 
-	this.direction = direction;
 	this.down = false;
 
-	this.minDistanceX = this.minDistanceY = 10;
-	this.maxDistanceX = this.maxDistanceY = 100;
+	this.maxDistance = 100;
+	this.minDistance = 10;
 
-	//this.minSpeed = 1;
-	//this.maxSpeed = 5;
-
+	this.swipeAccuracy = Math.cos( Math.PI / 8 ); // 22.5 degree accuracy
 	this.swipeBegan = false;
 	this.swipeDirection = undefined;
 	this.swipeDistance = undefined;
 
-	this._start = [];
+	this._start = vec2.create();
+	this._position = vec2.create();
+	this._helper = vec2.create();
 
 };
 
@@ -49,6 +58,7 @@ Swipe.EVENTS = {
 
 };
 
+
 module.exports = Swipe;
 
 
@@ -58,12 +68,7 @@ Swipe.prototype.pointerUp = function( x, y ){
 
 	if( this.swipeBegan ){
 
-		var distance = this.maxDistanceX;
-		if( this.swipeDirection === Swipe.DIRECTION.UP || this.swipeDirection === Swipe.DIRECTION.DOWN ){
-			distance = this.maxDistanceY;
-		}
-
-		if( Math.abs( this.swipeDistance ) > distance ){
+		if( Math.abs( this.swipeDistance ) > this.maxDistance ){
 			this.emit( Swipe.EVENTS.END, Swipe.EVENTS.END, this.swipeDirection, this.swipeDistance );
 		}else{
 			this.emit( Swipe.EVENTS.CANCEL, Swipe.EVENTS.CANCEL, this.swipeDirection, this.swipeDistance );
@@ -95,78 +100,60 @@ Swipe.prototype.reset = function(){
 };
 
 
-var calcSwipeDistance = function( distance, minDistance ){
-
-	// TODO: Prevent Distance inverting itself depending on Direction.
-
-	var dir = Math.abs( distance ) / distance;
-	return distance - ( minDistance*dir );
-
-};
-
 Swipe.prototype.pointerMove = function( x, y ){
 
 	if( this.down ){
 
-		var sx = this._start[0];
-		var sy = this._start[1];
+		this._position[0] = x;
+		this._position[1] = y;
 
-		var vx = sx - x;
-		var vy = sy - y;
+		var difference = vec2.subtract( this._helper, this._start, this._position );
+		var distance = vec2.length( difference );
 
-		// DO BASIC HERE FIRST..
-		// COULD HANDLE ANGLE BETWEEN, ETC..
-		//var angle = Math.atan2( sy - y, sx - x );
-		//console.log('DEGREES  = ', angle, ( 180 / Math.PI ) * angle );
-
-		//var distance = Math.sqrt( vx * vx + vy * vy );
-
-		if( !this.swipeBegan ){
+		if( !this.swipeBegan && distance > this.minDistance ){
 
 			this.swipeDirection = undefined;
 
-			if( vx > this.minDistanceX ){
-				this.swipeDistance = calcSwipeDistance( vx, this.minDistanceX );
-				this.swipeDirection = Swipe.DIRECTION.LEFT;
-			}else
-			if( vx < -this.minDistanceX ){
-				this.swipeDistance = calcSwipeDistance( vx, this.minDistanceX );
-				this.swipeDirection = Swipe.DIRECTION.RIGHT;
-			}else
-			if( vy > this.minDistanceY ){
+			difference[0] = -difference[0];
+			//difference[1] = -difference[1];
 
-				this.swipeDistance = calcSwipeDistance( vy, this.minDistanceY );
+			vec2.normalize( difference, difference );
+
+			var dotUp = vec2.dot( difference, UP );
+			var dotDown = vec2.dot( difference, DOWN );
+			var dotLeft = vec2.dot( difference, LEFT );
+			var dotRight = vec2.dot( difference, RIGHT );
+
+			if( dotUp > this.swipeAccuracy ){
 				this.swipeDirection = Swipe.DIRECTION.UP;
 			}else
-			if( vy < -this.minDistanceY ){
-				this.swipeDistance = calcSwipeDistance( vy, this.minDistanceY );
+			if( dotDown > this.swipeAccuracy ){
 				this.swipeDirection = Swipe.DIRECTION.DOWN;
+			}else
+			if( dotLeft > this.swipeAccuracy ){
+				this.swipeDirection = Swipe.DIRECTION.LEFT;
+			}else
+			if( dotRight > this.swipeAccuracy ){
+				this.swipeDirection = Swipe.DIRECTION.RIGHT;
 			}
 
 			if( this.swipeDirection ){
 
-				this.emit( Swipe.EVENTS.START, Swipe.EVENTS.START, this.swipeDirection, this.swipeDistance );
 				this.swipeBegan = true;
-
+				this.swipeDistance = distance;
+				this.emit( Swipe.EVENTS.START, Swipe.EVENTS.START, this.swipeDirection, this.swipeDistance );
 			}
 
 		}else{
 
-			switch( this.swipeDirection ){
-
-				case Swipe.DIRECTION.LEFT :
-				case Swipe.DIRECTION.RIGHT :
-					this.swipeDistance = calcSwipeDistance( vx, this.minDistanceX );
-					this.emit( Swipe.EVENTS.UPDATE, Swipe.EVENTS.UPDATE, this.swipeDirection, this.swipeDistance );
-					break;
-
-				case Swipe.DIRECTION.UP:
-				case Swipe.DIRECTION.DOWN :
-					this.swipeDistance = calcSwipeDistance( vy, this.minDistanceY );
-					this.emit( Swipe.EVENTS.UPDATE, Swipe.EVENTS.UPDATE, this.swipeDirection, this.swipeDistance );
-					break;
-
+			if( this.swipeDirection === Swipe.DIRECTION.UP || this.swipeDirection === Swipe.DIRECTION.DOWN ){
+				this.swipeDistance = difference[1];
+			}else
+			if( this.swipeDirection === Swipe.DIRECTION.LEFT || this.swipeDirection === Swipe.DIRECTION.RIGHT ){
+				this.swipeDistance = difference[0];
 			}
+
+			this.emit( Swipe.EVENTS.UPDATE, Swipe.EVENTS.UPDATE, this.swipeDirection, this.swipeDistance );
 
 		}
 
