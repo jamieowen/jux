@@ -28,6 +28,9 @@
   },
   "dependencies": {
     "binary-search-bounds": "^2.0.3",
-    "signals": "^1.0.0"
+    "eventemitter3": "^1.2.0",
+    "gl-vec2": "^1.0.0",
+    "signals": "^1.0.0",
+    "weak-map": "^1.0.5"
   }
 }

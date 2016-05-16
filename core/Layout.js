@@ -1,12 +1,12 @@
 
-var Signal 		   = require( 'signals' );
-var objectAssign   = require( 'object-assign' );
+var Signal = require( 'signals' );
+var objectAssign = require( 'object-assign' );
 
 var ObservableOpts = require( './util/ObservableOpts' );
-var Bounds 		   = require( './bounds/Bounds');
+var Bounds = require( './bounds/Bounds');
 
-var RendererPool   = require( './RendererPool' );
-var RendererProxy  = require( './RendererProxy' );
+var Pool = require( './Pool' );
+var Adaptor = require( './Adaptor' );
 
 var boundsHelper = new Bounds();
 
@@ -36,12 +36,12 @@ var Layout = function( data, opts, config, layoutMethod ){
 
 	this.axis    = config.axis;
 	this.indexer = config.indexer;
-	this.proxy   = config.proxy || new RendererProxy();
-	this.pool	 = config.pool || new RendererPool();
+	this.adaptor   = config.adaptor || new Adaptor();
+	this.pool	 = config.pool || new Pool();
 
 	this.layout  = layoutMethod;
 
-	//this.proxy = config.proxy || new DefaultProxy();
+	//this.adaptor = config.proxy || new DefaultProxy();
 	//this.indexer = config.indexer || new DefaultIndexer(1);
 	//this._dataIsRenderer = optsOrLayout.dataIsRenderer === undefined ? false : optsOrLayout.dataIsRenderer;
 
@@ -91,10 +91,10 @@ Layout.prototype = {
 				// with no association to data object.
 
 				obj = this.pool.create(data);//this.pool.get( data );
-				this.proxy.data_set( obj, data );
+				this.adaptor.data_set( obj, data );
 
-				this.layout( i, data, obj, prevObj, this.proxy, this.opts );
-				this.proxy.bounds_get( obj, bounds );
+				this.layout( i, data, obj, prevObj, this.adaptor, this.opts );
+				this.adaptor.bounds_get( obj, bounds );
 
 				this.bounds.x = Math.min( bounds.left, this.bounds.left );
 				this.bounds.y = Math.min( bounds.top, this.bounds.top );
@@ -111,19 +111,19 @@ Layout.prototype = {
 
 		if( this.needsIndexerUpdate ){
 			this.needsIndexerUpdate = false;
-			this.indexer.index( this.objects, this.proxy )
+			this.indexer.index( this )
 		}
 
 	},
 
 	find: function( viewBounds, results ){
 
-		return this.indexer.find( viewBounds, this.proxy, results );
+		return this.indexer.find( viewBounds, this.adaptor, results );
 
 	},
 
 	// override
-	layout: function( i, data, obj, prevObj, proxy, opts ){
+	layout: function( i, data, obj, prevObj, adaptor, opts ){
 
 	}
 };

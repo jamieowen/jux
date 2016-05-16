@@ -1,7 +1,7 @@
 
-var RendererProxy = require( '@jux/core/RendererProxy' );
+var Adaptor = require( '../core/Adaptor' );
 
-var DomRendererProxy = RendererProxy.extend( {
+var DomAdaptor = Adaptor.extend( {
 
 	data_get: function( domElement ){
 		//return domElement.userData;
@@ -89,8 +89,8 @@ var DomRendererProxy = RendererProxy.extend( {
 		domElement.style.height = height + 'px';
 	}
 
-}, 'DomRendererProxy', false );
+}, 'DomAdaptor', false );
 
 
-DomRendererProxy.extend = RendererProxy.createExtends( DomRendererProxy );
-module.exports = DomRendererProxy;
+DomAdaptor.extend = Adaptor.createExtends( DomAdaptor );
+module.exports = DomAdaptor;

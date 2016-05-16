@@ -11,6 +11,11 @@ var createObservableOpts = function( opts ){
 
 	if( cached[id] ){
 		var instance = new cached[id]();
+
+		for( key in opts ){
+			instance[ key ] = opts[ key ];
+		}
+
 		return instance;
 	}
 

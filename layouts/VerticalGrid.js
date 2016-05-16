@@ -2,10 +2,9 @@
 var objectAssign  = require( 'object-assign' );
 
 var Layout 		  = require( '@jux/core/Layout' );
-var BinarySearch  = require( '@jux/core/indexing/BinarySearch' );
-var NoIndex  	  = require( '@jux/core/indexing/NoIndex' );
 var RendererProxy = require( '@jux/core/RendererProxy' );
 var RendererPool  = require( '@jux/core/RendererPool' );
+var AxisIndex	  = require( '../indexing/AxisIndex' );
 
 var defaultOpts = {
 
@@ -22,7 +21,7 @@ var VerticalGridLayout = function( data, opts ){
 
 	var config = {
 		axis: 'y',
-		indexer: new NoIndex(),
+		indexer: new AxisIndex(),
 		proxy: new RendererProxy(),
 		pool: new RendererPool()
 	};

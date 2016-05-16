@@ -1,7 +1,7 @@
 
-var RendererPool = require( '@jux/core/RendererPool' );
+var Pool = require( '../core/Pool' );
 
-var DomRendererPool = RendererPool.extend( {
+var DomRendererPool = Pool.extend( {
 
 	create: function( data ){
 
@@ -16,5 +16,5 @@ var DomRendererPool = RendererPool.extend( {
 
 }, 'DomRendererPool', false );
 
-DomRendererPool.extend = RendererPool.createExtends( DomRendererPool );
+DomRendererPool.extend = Pool.createExtends( DomRendererPool );
 module.exports = DomRendererPool;

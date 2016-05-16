@@ -26,7 +26,7 @@ ThreeView.prototype = {
 	setup: function(){
 
 		this.scene = new THREE.Scene();
-		this.camera = new THREE.PerspectiveCamera( 45, 4/3, 1,1000 );
+		this.camera = new THREE.PerspectiveCamera( 45, 4/3, 1,10000 );
 
 		this.renderer = new THREE.WebGLRenderer( {
 			antialias: true
@@ -35,14 +35,36 @@ ThreeView.prototype = {
 		this.renderer.setPixelRatio( Math.min( window.devicePixelRatio,2 ) );
 		this.renderer.setClearColor( 0x000000, 1 );
 
-		this.geometry = new THREE.SphereBufferGeometry(9);
+		this.geometry = new THREE.SphereBufferGeometry(10);
+		this.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 10,-10,10 ) );
+
 		this.material = new THREE.MeshBasicMaterial( {
 			wireframe: true,
 			color: 0xFF0000
 		});
 
+		this.blueMaterial = new THREE.MeshBasicMaterial( {
+			color: 0x4444ff
+		});
+
+		this.yellowMaterial = new THREE.MeshBasicMaterial( {
+			color: 0x44ffff
+		});
+
 		var plane = new THREE.PlaneBufferGeometry( 300,300 );
 		var mesh = new THREE.Mesh( plane, this.material );
+
+		var light = new THREE.PointLight();
+		light.position.z = 100;
+		this.scene.add( light );
+
+		var bounds = new THREE.PlaneBufferGeometry( 1,1 );
+		bounds.applyMatrix( new THREE.Matrix4().makeTranslation( 0.5,-0.5,0 ) );
+		var boundsMesh = new THREE.Mesh( bounds, this.blueMaterial );
+		this.scene.add( boundsMesh );
+		boundsMesh.scale.x = 100;
+		boundsMesh.scale.y = 300;
+
 
 		this.interactionPlane = mesh;
 		this.scene.rotation.x = -Math.PI * 0.25;
@@ -74,7 +96,7 @@ ThreeView.prototype = {
 			pool: Jux.RendererPool.extend( {
 
 				create: function( data ){
-					return new THREE.Mesh( scope.geometry, scope.material );
+					return new THREE.Mesh( scope.geometry, scope.yellowMaterial );
 				}
 
 			}),
@@ -112,10 +134,19 @@ ThreeView.prototype = {
 
 		if( layout ){
 
-			this.scroller.axes[0].max = layout.bounds.width;
-			this.scroller.axes[1].max = layout.bounds.height;
-			this.scroller.axes[0].viewSize = 10;
-			this.scroller.axes[1].viewSize = 10;
+			if( layout.axis === 'x' ){
+				this.scroller.axes[0].max = layout.bounds.width;
+				this.scroller.axes[1].max = layout.bounds.height;
+				this.scroller.axes[0].viewSize = 0.1;
+				this.scroller.axes[1].viewSize = layout.bounds.height;
+			}else
+			if( layout.axis === 'y' ){
+				this.scroller.axes[0].max = layout.bounds.width;
+				this.scroller.axes[1].max = layout.bounds.height;
+				this.scroller.axes[0].viewSize = layout.bounds.width;
+				this.scroller.axes[1].viewSize = 0.01;//0;
+			}
+
 
 		}
 
@@ -133,9 +164,9 @@ ThreeView.prototype = {
 		this.view.update();
 		this.renderer.render( this.scene, this.camera );
 
-		this.camera.position.z = 600;
-		this.camera.position.y = -100;
-		this.camera.position.x = -300;
+		this.camera.position.z = 200;
+		this.camera.position.y = 0;//100;
+		//this.camera.position.x = -200;
 		this.camera.lookAt( this.interactionPlane.position );
 
 	},
@@ -148,7 +179,7 @@ ThreeView.prototype = {
 		this.camera.updateProjectionMatrix();
 
 		//this.view.size( 100,100 );
-		this.view.size( w,h );
+		this.view.size( 100,100 );
 		//this.scroller.setViewSize( w,h );
 
 	},

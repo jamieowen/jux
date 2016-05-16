@@ -2,6 +2,7 @@
 // Jux
 
 var VerticalGrid = require( '@jux/layouts/VerticalGrid' );
+var HorizontalGrid = require( '@jux/layouts/HorizontalGrid' );
 
 // Example
 var ThreeView = require( './views/ThreeView' );
@@ -12,7 +13,7 @@ var CompleteExample = function(){
 	this.state = null;
 	this.data = [];
 
-	var i = 100;
+	var i = 1000;
 	while( i-- ){
 		this.data.push( {
 			idx: i
@@ -23,7 +24,16 @@ var CompleteExample = function(){
 	this.verticalGrid = new VerticalGrid( this.data,{
 
 		gridWidth: 3,
-		itemSpacing: 1,
+		itemSpacing: 5,
+		itemWidth: 20,
+		itemHeight: 20
+
+	} );
+
+	this.horizontalGrid = new HorizontalGrid( this.data,{
+
+		gridHeight: 3,
+		itemSpacing: 5,
 		itemWidth: 20,
 		itemHeight: 20
 
@@ -38,7 +48,8 @@ var CompleteExample = function(){
 	this.currentLayout = null;
 
 	this.setView( this.threeView );
-	this.setLayout( this.verticalGrid );
+	//this.setLayout( this.verticalGrid );
+	this.setLayout( this.horizontalGrid );
 
 	this.update = this.update.bind(this);
 	this.update();

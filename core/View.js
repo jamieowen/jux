@@ -8,7 +8,7 @@ var View = function( layout, config ){
 		throw new Error( 'Config needs specifying' );
 	}
 
-	if( !config.pool || !config.proxy || !config.container ){
+	if( !config.pool || !config.adaptor || !config.container ){
 		throw new Error( 'Missing configuration arguments for View.' );
 	}
 
@@ -16,7 +16,7 @@ var View = function( layout, config ){
 
 	this.layout 	 = layout;
 	this.container   = config.container;
-	this.proxy 		 = config.proxy;
+	this.adaptor 	 = config.adaptor;
 	this.pool		 = config.pool;
 
 
@@ -105,13 +105,13 @@ View.prototype = {
 
 			var renderer,layoutItem,data,previousIdx;
 
-			var rendererProxy = this.proxy;
-			var layoutProxy;
+			var rendererAdaptor = this.adaptor;
+			var layoutAdaptor;
 			var container = this.container;
 
 			if( this.layout ){
 				this.layout.find( helperViewport, this.results );
-				layoutProxy = this.layout.proxy;
+				layoutAdaptor = this.layout.adaptor;
 			}
 
 			//var lastLength = this.results.length;
@@ -119,19 +119,19 @@ View.prototype = {
 			while( this.results.length ){
 
 				layoutItem = this.results.shift();
-				data = layoutProxy.data_get( layoutItem );
+				data = layoutAdaptor.data_get( layoutItem );
 
 				// create renderer and position.
-				layoutProxy.position_get( layoutItem, helperPoint );
-				layoutProxy.size_get( layoutItem, helperSize );
+				layoutAdaptor.position_get( layoutItem, helperPoint );
+				layoutAdaptor.size_get( layoutItem, helperSize );
 
 				renderer = this.pool.get( layoutItem );
-				rendererProxy.data_set( renderer, data );
-				rendererProxy.position_set( renderer,
+				rendererAdaptor.data_set( renderer, data );
+				rendererAdaptor.position_set( renderer,
 					helperPoint.x - helperViewport.x - this.margin.left,
 					helperPoint.y - helperViewport.y - this.margin.top
 				);
-				rendererProxy.size_set( renderer, helperSize.width, helperSize.height );
+				rendererAdaptor.size_set( renderer, helperSize.width, helperSize.height );
 
 				// check if the renderer has already been added.
 				// if it has remove it from previousData
@@ -142,7 +142,7 @@ View.prototype = {
 				if( previousIdx >= 0 ){
 					previousData.splice( previousIdx,1 );
 				}else{
-					rendererProxy.child_add( container, renderer );
+					rendererAdaptor.child_add( container, renderer );
 				}
 
 				this.visibleData.push( layoutItem );
@@ -159,8 +159,8 @@ View.prototype = {
 				layoutItem = previousData[i];
 				renderer = this.pool.release( layoutItem );
 
-				rendererProxy.data_set( renderer,null );
-				rendererProxy.child_remove( container, renderer );
+				rendererAdaptor.data_set( renderer,null );
+				rendererAdaptor.child_remove( container, renderer );
 
 			}
 
