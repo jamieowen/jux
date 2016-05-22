@@ -37,8 +37,9 @@ var createObservableOpts = function( opts ){
 				'return this._' + key + ';'
 			].join('')),
 			set: new Function( 'value', [
+				'if( this._' + key + ' === value ){ return; }',
 				'this._' + key + ' = value;',
-				'this.onChanged.dispatch("' + key + '")'
+				'this.onChanged.dispatch( "' + key + '")'
 			].join(''))
 		} );
 

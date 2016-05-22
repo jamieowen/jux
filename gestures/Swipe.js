@@ -87,8 +87,6 @@ Swipe.prototype.pointerDown = function( x, y ){
 	this.reset();
 	this._start = [ x, y ];
 
-	console.log( 'SWIPE ... POINTER DOWN' );
-
 };
 
 Swipe.prototype.reset = function(){
@@ -140,17 +138,23 @@ Swipe.prototype.pointerMove = function( x, y ){
 			if( this.swipeDirection ){
 
 				this.swipeBegan = true;
-				this.swipeDistance = distance;
+				this.swipeDistance = distance - this.minDistance;
 				this.emit( Swipe.EVENTS.START, Swipe.EVENTS.START, this.swipeDirection, this.swipeDistance );
 			}
 
 		}else{
 
 			if( this.swipeDirection === Swipe.DIRECTION.UP || this.swipeDirection === Swipe.DIRECTION.DOWN ){
-				this.swipeDistance = difference[1];
+
+				var dir = Math.abs( difference[1] ) / difference[1];
+				this.swipeDistance = difference[1] - ( this.minDistance * dir );
+
 			}else
 			if( this.swipeDirection === Swipe.DIRECTION.LEFT || this.swipeDirection === Swipe.DIRECTION.RIGHT ){
-				this.swipeDistance = difference[0];
+
+				var dir = Math.abs( difference[0] ) / difference[0];
+				this.swipeDistance = difference[0] - ( this.minDistance * dir );
+
 			}
 
 			this.emit( Swipe.EVENTS.UPDATE, Swipe.EVENTS.UPDATE, this.swipeDirection, this.swipeDistance );

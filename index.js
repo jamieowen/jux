@@ -4,10 +4,10 @@ module.exports = {
 	Layout: require( './core/Layout' ),
 	View: require( './core/View' ),
 	Pool: require( './core/Pool' ),
-	//TypePool: require( './core/TypePool' ),
+	TypedPool: require( './core/TypedPool' ),
 	//LoosePool: require( './core/LoosePool' ),
-	Adaptor: require( './core/Adaptor' ),
 
+	Adapter: require( './core/Adapter' ),
 
 	NoIndex: require( './indexing/NoIndex' ),
 	AxisIndex: require( './indexing/AxisIndex' ),
@@ -16,12 +16,15 @@ module.exports = {
 	Scroller: require( './scroller/Scroller' ),
 	ScrollerAxis: require( './scroller/ScrollerAxis' ),
 
+	VerticalGrid: require( './layouts/VerticalGrid' ),
+	HorizontalGrid: require( './layouts/HorizontalGrid' ),
+
 	Pointer: require( './dom/Pointer' ),
 
-	Swipe: require( './gestures/Swipe')
-	
-	
-	
+	Swipe: require( './gestures/Swipe'),
+
+	ThreePointer: require( './three/Pointer' ),
+	ThreeAdapter: require( './three/Adapter' )
 	
 	//core: require( './core' ),
 	//scroller: require( './scroller' )

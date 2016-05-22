@@ -6,7 +6,7 @@ var ObservableOpts = require( './util/ObservableOpts' );
 var Bounds = require( './bounds/Bounds');
 
 var Pool = require( './Pool' );
-var Adaptor = require( './Adaptor' );
+var Adapter = require( './Adapter' );
 
 var boundsHelper = new Bounds();
 
@@ -36,12 +36,12 @@ var Layout = function( data, opts, config, layoutMethod ){
 
 	this.axis    = config.axis;
 	this.indexer = config.indexer;
-	this.adaptor   = config.adaptor || new Adaptor();
+	this.adapter   = config.adapter || new Adapter();
 	this.pool	 = config.pool || new Pool();
 
 	this.layout  = layoutMethod;
 
-	//this.adaptor = config.proxy || new DefaultProxy();
+	//this.adapter = config.proxy || new DefaultProxy();
 	//this.indexer = config.indexer || new DefaultIndexer(1);
 	//this._dataIsRenderer = optsOrLayout.dataIsRenderer === undefined ? false : optsOrLayout.dataIsRenderer;
 
@@ -90,11 +90,18 @@ Layout.prototype = {
 				// here..Bounds - should just be regular pool
 				// with no association to data object.
 
-				obj = this.pool.create(data);//this.pool.get( data );
-				this.adaptor.data_set( obj, data );
+				// BUT... update as of 21/6 - this causes big issues
+				// when updating layouts - as the View uses a ref to the layoutItem
+				// to weak map the renderer to the pool.
+				// One solution may be to make a clear requirement
+				// that data objects can't be duplicated in the source array.
 
-				this.layout( i, data, obj, prevObj, this.adaptor, this.opts );
-				this.adaptor.bounds_get( obj, bounds );
+				//obj = this.pool.create(data);//this.pool.get( data );
+				obj = this.pool.get( data );
+				this.adapter.data_set( obj, data );
+
+				this.layout( i, data, obj, prevObj, this.adapter, this.opts );
+				this.adapter.bounds_get( obj, bounds );
 
 				this.bounds.x = Math.min( bounds.left, this.bounds.left );
 				this.bounds.y = Math.min( bounds.top, this.bounds.top );
@@ -118,12 +125,12 @@ Layout.prototype = {
 
 	find: function( viewBounds, results ){
 
-		return this.indexer.find( viewBounds, this.adaptor, results );
+		return this.indexer.find( viewBounds, this.adapter, results );
 
 	},
 
 	// override
-	layout: function( i, data, obj, prevObj, adaptor, opts ){
+	layout: function( i, data, obj, prevObj, adapter, opts ){
 
 	}
 };
@@ -136,6 +143,7 @@ Object.defineProperties( Layout.prototype, {
 		},
 
 		set: function( data ){
+
 			if( this._data === data ){
 				return;
 			}

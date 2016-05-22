@@ -8,7 +8,7 @@ var View = function( layout, config ){
 		throw new Error( 'Config needs specifying' );
 	}
 
-	if( !config.pool || !config.adaptor || !config.container ){
+	if( !config.pool || !config.adapter || !config.container ){
 		throw new Error( 'Missing configuration arguments for View.' );
 	}
 
@@ -16,19 +16,8 @@ var View = function( layout, config ){
 
 	this.layout 	 = layout;
 	this.container   = config.container;
-	this.adaptor 	 = config.adaptor;
+	this.adapter 	 = config.adapter;
 	this.pool		 = config.pool;
-
-
-	if( this.layout ){
-
-		this.layout.onLayoutUpdated.add( function(){
-			console.log( 'LAYOUT UPDATED' );
-			this.needsUpdate = true;
-			this.layoutHasChanged = true;
-		}.bind(this));
-
-	}
 
 
 	this._viewport	 = new Bounds();
@@ -47,6 +36,20 @@ var View = function( layout, config ){
 	this.visibleData 	  = [];
 	this.visibleRenderers = [];
 	this.results 		  = [];
+
+	if( this.layout ){
+
+		this.layout.onLayoutUpdated.add( function( key ){
+
+			this.needsUpdate = true;
+
+			this.layoutDataChanged = true;
+
+			// Do we trigger a clean up of previous renderers here?
+
+		}.bind(this) );
+
+	}
 };
 
 var helperPoint 	= { x: 0, y: 0 };
@@ -105,13 +108,13 @@ View.prototype = {
 
 			var renderer,layoutItem,data,previousIdx;
 
-			var rendererAdaptor = this.adaptor;
-			var layoutAdaptor;
+			var rendererAdapter = this.adapter;
+			var layoutAdapter;
 			var container = this.container;
 
 			if( this.layout ){
 				this.layout.find( helperViewport, this.results );
-				layoutAdaptor = this.layout.adaptor;
+				layoutAdapter = this.layout.adapter;
 			}
 
 			//var lastLength = this.results.length;
@@ -119,19 +122,19 @@ View.prototype = {
 			while( this.results.length ){
 
 				layoutItem = this.results.shift();
-				data = layoutAdaptor.data_get( layoutItem );
+				data = layoutAdapter.data_get( layoutItem );
 
 				// create renderer and position.
-				layoutAdaptor.position_get( layoutItem, helperPoint );
-				layoutAdaptor.size_get( layoutItem, helperSize );
+				layoutAdapter.position_get( layoutItem, helperPoint );
+				layoutAdapter.size_get( layoutItem, helperSize );
 
 				renderer = this.pool.get( layoutItem );
-				rendererAdaptor.data_set( renderer, data );
-				rendererAdaptor.position_set( renderer,
+				rendererAdapter.data_set( renderer, data );
+				rendererAdapter.position_set( renderer,
 					helperPoint.x - helperViewport.x - this.margin.left,
 					helperPoint.y - helperViewport.y - this.margin.top
 				);
-				rendererAdaptor.size_set( renderer, helperSize.width, helperSize.height );
+				rendererAdapter.size_set( renderer, helperSize.width, helperSize.height );
 
 				// check if the renderer has already been added.
 				// if it has remove it from previousData
@@ -142,7 +145,7 @@ View.prototype = {
 				if( previousIdx >= 0 ){
 					previousData.splice( previousIdx,1 );
 				}else{
-					rendererAdaptor.child_add( container, renderer );
+					rendererAdapter.child_add( container, renderer );
 				}
 
 				this.visibleData.push( layoutItem );
@@ -153,14 +156,15 @@ View.prototype = {
 			//console.log( 'update view' );
 			//console.log( 'UPDATE :', lastLength, this.visibleData.length, previousData.length );
 
+
 			// remove old renderers.
 			for( var i = 0; i<previousData.length; i++ ){
 
 				layoutItem = previousData[i];
 				renderer = this.pool.release( layoutItem );
 
-				rendererAdaptor.data_set( renderer,null );
-				rendererAdaptor.child_remove( container, renderer );
+				rendererAdapter.data_set( renderer,null );
+				rendererAdapter.child_remove( container, renderer );
 
 			}
 

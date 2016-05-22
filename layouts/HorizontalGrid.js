@@ -1,10 +1,10 @@
 
 var objectAssign  = require( 'object-assign' );
 
-var Layout 		  = require( '@jux/core/Layout' );
-var RendererProxy = require( '@jux/core/RendererProxy' );
-var RendererPool  = require( '@jux/core/RendererPool' );
-var AxisIndex	  = require( '../indexing/AxisIndex' );
+var Layout = require( '../core/Layout' );
+var Adapter = require( '../core/Adapter' );
+var Pool  = require( '../core/Pool' );
+var AxisIndex = require( '../indexing/AxisIndex' );
 
 var defaultOpts = {
 
@@ -22,24 +22,24 @@ var HorizontalGridLayout = function( data, opts ){
 	var config = {
 		axis: 'x',
 		indexer: new AxisIndex(),
-		proxy: new RendererProxy(),
-		pool: new RendererPool()
+		adapter: new Adapter(),
+		pool: new Pool()
 	};
 
 	data = data || [];
 
 	Layout.call( this, data, opts, config,
 
-		function layout( i, data, obj, prevObj, proxy, opts ){
+		function layout( i, data, obj, prevObj, adapter, opts ){
 
 			var col = Math.floor( i / opts.gridHeight );
 			var row = i % opts.gridHeight;
 
-			proxy.position_set( obj,
+			adapter.position_set( obj,
 				opts.itemWidth * col + ( col * opts.itemSpacing ),
 				opts.itemHeight * row + ( row * opts.itemSpacing ) );
 
-			proxy.size_set( obj, opts.itemWidth, opts.itemHeight )
+			adapter.size_set( obj, opts.itemWidth, opts.itemHeight )
 
 		}
 

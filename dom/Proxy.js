@@ -1,7 +1,7 @@
 
-var Adaptor = require( '../core/Adaptor' );
+var Adapter = require( '../core/Adapter' );
 
-var DomAdaptor = Adaptor.extend( {
+var DomAdapter = Adapter.extend( {
 
 	data_get: function( domElement ){
 		//return domElement.userData;
@@ -89,8 +89,8 @@ var DomAdaptor = Adaptor.extend( {
 		domElement.style.height = height + 'px';
 	}
 
-}, 'DomAdaptor', false );
+}, 'DomAdapter', false );
 
 
-DomAdaptor.extend = Adaptor.createExtends( DomAdaptor );
-module.exports = DomAdaptor;
+DomAdapter.extend = Adapter.createExtends( DomAdapter );
+module.exports = DomAdapter;

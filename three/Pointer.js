@@ -1,5 +1,5 @@
 
-var Pointer = require( '@jux/dom/Pointer' );
+var Pointer = require( '../dom/Pointer' );
 var EventEmitter = require( 'eventemitter3' );
 
 var helperVec = {

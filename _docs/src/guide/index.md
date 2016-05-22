@@ -25,7 +25,7 @@ var Core = require( '@jux/ui/core' );
 var view = new Jux.ScrollView( {
 
 	container: new THREE.Scene(),
-	adaptor: new Jux.ThreeAdaptor(),
+	adapter: new Jux.ThreeAdapter(),
 	pool: new Jux.TypedPool(),
 	layout: new Jux.VerticalGrid(),
 	pointer: new Jux.ThreePointer()

@@ -168,7 +168,6 @@ Pointer.prototype.onEvent = function( ev ){
 		case 'touchend':
 		case 'touchcancel':
 
-
 			this.down = false;
 			this.emit( Pointer.EVENT.UP,event );
 

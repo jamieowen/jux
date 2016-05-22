@@ -1,7 +1,7 @@
 
-var RendererProxy = require( '@jux/core/RendererProxy' );
+var Adapter = require( '../core/Adapter' );
 
-var ThreeRendererProxy = RendererProxy.extend( {
+var ThreeAdapter = Adapter.extend( {
 
 	data_get: function( threeObj ){
 		return threeObj.userData;
@@ -89,8 +89,8 @@ var ThreeRendererProxy = RendererProxy.extend( {
 		//threeObj.height = height;
 	}	
 
-}, 'ThreeRendererProxy', false );
+}, 'ThreeAdapter', false );
 
 
-ThreeRendererProxy.extend = RendererProxy.createExtends( ThreeRendererProxy );
-module.exports = ThreeRendererProxy;
+ThreeAdapter.extend = Adapter.createExtends( ThreeAdapter );
+module.exports = ThreeAdapter;

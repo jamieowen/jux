@@ -14,7 +14,7 @@
 - [Layouts]()  
 - [Gestures]()
 
-**Adaptors**
+**Adapters**
 
 [Dom]()  
 [Three.js]()  
@@ -74,7 +74,7 @@ var Grid = require( '@jux/ui/Grid' );
 
 
 
-Its recommended that you include the dom adaptor with most projects even if it is a Three.js
+Its recommended that you include the dom adapter with most projects even if it is a Three.js
 or Pixi.js project.  As at some point you will probably use Pointer events from the DOM.
 ```
 

@@ -1,19 +1,19 @@
 
 var createExtends 	= require( './util/createExtends' );
 
-var RendererProxy = function(){
+var RendererAdapter = function(){
 
 };
 
 
-RendererProxy.createExtends = createExtends;
-RendererProxy.extend = createExtends( RendererProxy );
-module.exports = RendererProxy;
+RendererAdapter.createExtends = createExtends;
+RendererAdapter.extend = createExtends( RendererAdapter );
+module.exports = RendererAdapter;
 
 
-RendererProxy.prototype = {
+RendererAdapter.prototype = {
 
-	constructor: RendererProxy,
+	constructor: RendererAdapter,
 
 	data_get: function( obj ){
 		return obj.data;

@@ -1,11 +1,7 @@
 
-// Jux
-
-var VerticalGrid = require( '@jux/layouts/VerticalGrid' );
-var HorizontalGrid = require( '@jux/layouts/HorizontalGrid' );
-
-// Example
+var Jux = require( '@jux/x');
 var ThreeView = require( './views/ThreeView' );
+var typeNames = require( './typeNames' );
 
 
 var CompleteExample = function(){
@@ -13,26 +9,27 @@ var CompleteExample = function(){
 	this.state = null;
 	this.data = [];
 
-	var i = 1000;
+	var i = 100;
 	while( i-- ){
 		this.data.push( {
-			idx: i
+			idx: i,
+			type: typeNames[ i % typeNames.length ]
 		})
 	}
 
 	// Create Jux Layouts.
-	this.verticalGrid = new VerticalGrid( this.data,{
+	this.verticalGrid = new Jux.VerticalGrid( this.data,{
 
-		gridWidth: 3,
+		gridWidth: 4,
 		itemSpacing: 5,
 		itemWidth: 20,
 		itemHeight: 20
 
 	} );
 
-	this.horizontalGrid = new HorizontalGrid( this.data,{
+	this.horizontalGrid = new Jux.HorizontalGrid( this.data,{
 
-		gridHeight: 3,
+		gridHeight: 4,
 		itemSpacing: 5,
 		itemWidth: 20,
 		itemHeight: 20
@@ -48,8 +45,8 @@ var CompleteExample = function(){
 	this.currentLayout = null;
 
 	this.setView( this.threeView );
-	//this.setLayout( this.verticalGrid );
-	this.setLayout( this.horizontalGrid );
+	this.setLayout( this.verticalGrid );
+	//this.setLayout( this.horizontalGrid );
 
 	this.update = this.update.bind(this);
 	this.update();

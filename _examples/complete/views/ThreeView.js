@@ -1,10 +1,9 @@
 
-var Jux = require( '@jux/core' );
-var Scroller = require( '@jux/scroller' );
-//var Pointer = require( '@jux/dom/Pointer' );
-var Pointer = require( '@jux/three/Pointer' );
-
 var THREE = require( 'three' );
+
+var Jux = require( '@jux/x' );
+var typeNames = require( '../typeNames' );
+
 
 var ThreeView = function(){
 
@@ -35,39 +34,107 @@ ThreeView.prototype = {
 		this.renderer.setPixelRatio( Math.min( window.devicePixelRatio,2 ) );
 		this.renderer.setClearColor( 0x000000, 1 );
 
-		this.geometry = new THREE.SphereBufferGeometry(10);
-		this.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 10,-10,10 ) );
+		//this.geometry = new THREE.SphereBufferGeometry(10);
+		//this.geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 10,-10,10 ) );
 
-		this.material = new THREE.MeshBasicMaterial( {
-			wireframe: true,
-			color: 0xFF0000
-		});
+		this.geometriesByType = {};
+		this.geometries = typeNames.map( function( type, i ){
 
-		this.blueMaterial = new THREE.MeshBasicMaterial( {
-			color: 0x4444ff
-		});
+			var geometry;
+			switch( i ){
+				case 0 :
+					geometry = new THREE.SphereBufferGeometry(10);
+					break;
+				case 1 :
+					geometry = THREE.SphereBufferGeometry(8);
+					break;
+				case 2 :
+					geometry = new THREE.SphereBufferGeometry(4);
+					break;
+				case 3 :
+					geometry = new THREE.SphereBufferGeometry(12);
+					break;
+				case 4 :
+					geometry = new THREE.SphereBufferGeometry(5);
+					break;
 
-		this.yellowMaterial = new THREE.MeshBasicMaterial( {
-			color: 0x44ffff
-		});
+			}
+
+			this.geometriesByType[ type ] = geometry;
+			return geometry;
+
+		}.bind(this));
+
+		this.materialsByType = {};
+		this.materials = typeNames.map( function( type, i ){
+
+			var material;
+			switch( i ){
+				case 0 :
+					material = new THREE.MeshPhongMaterial( {
+						color: 0x00ffff,
+						shading: THREE.FlatShading,
+						shininess: 20
+					});
+					break;
+				case 1 :
+					material = new THREE.MeshPhongMaterial( {
+						color: 0x00ffff,
+						shading: THREE.FlatShading,
+						shininess: 20
+					});
+					break;
+				case 2 :
+					material = new THREE.MeshPhongMaterial( {
+						color: 0x00ffff,
+						shading: THREE.FlatShading,
+						shininess: 20
+					});
+					break;
+				case 3 :
+					material = new THREE.MeshPhongMaterial( {
+						color: 0x00ffff,
+						shading: THREE.FlatShading,
+						shininess: 20
+					});
+					break;
+				case 4 :
+					material = new THREE.MeshPhongMaterial( {
+						color: 0x00ffff,
+						shading: THREE.FlatShading,
+						shininess: 20
+					});
+					break;
+
+			}
+
+			this.materialsByType[ type ] = material;
+			return material;
+
+		}.bind(this));
+
+		this.container = new THREE.Object3D();
+		//this.container.position.x = -50;
+		this.scene.add( this.container );
 
 		var plane = new THREE.PlaneBufferGeometry( 300,300 );
 		var mesh = new THREE.Mesh( plane, this.material );
 
-		var light = new THREE.PointLight();
+		var light = new THREE.PointLight( {color:0xff0000});
 		light.position.z = 100;
 		this.scene.add( light );
 
 		var bounds = new THREE.PlaneBufferGeometry( 1,1 );
-		bounds.applyMatrix( new THREE.Matrix4().makeTranslation( 0.5,-0.5,0 ) );
+		//bounds.applyMatrix( new THREE.Matrix4().makeTranslation( 0.5,-0.5,0 ) );
 		var boundsMesh = new THREE.Mesh( bounds, this.blueMaterial );
-		this.scene.add( boundsMesh );
+		//this.scene.add( boundsMesh );
 		boundsMesh.scale.x = 100;
 		boundsMesh.scale.y = 300;
 
 
 		this.interactionPlane = mesh;
-		this.scene.rotation.x = -Math.PI * 0.25;
+		//this.scene.rotation.x = -Math.PI * 0.25;
+		//this.scene.position.x = -200;
 		this.scene.add( mesh );
 
 	},
@@ -76,11 +143,11 @@ ThreeView.prototype = {
 
 		var scope = this;
 
-		this.scroller = new Scroller( {
+		this.scroller = new Jux.Scroller( {
 			axes: [true,true,false]
 		});
 
-		this.pointer = new Pointer(
+		this.pointer = new Jux.ThreePointer(
 			this.renderer.domElement,
 			this.camera,
 			new THREE.Raycaster(),
@@ -89,27 +156,43 @@ ThreeView.prototype = {
 
 		this.scroller.bindPointer( this.pointer );
 
+		var scope = this;
+
 		this.view = new Jux.View( null, {
 
-			container: this.scene,
+			container: this.container,
 
-			pool: Jux.RendererPool.extend( {
+			pool: Jux.TypedPool.extend( {
 
-				create: function( data ){
-					return new THREE.Mesh( scope.geometry, scope.yellowMaterial );
+				listTypes: function(){
+					return typeNames;
+				},
+
+				getType: function( data ){
+					return data.type;
+				},
+
+				create: function( data, type ){
+
+					var material = scope.materialsByType[ type ];
+					var geometry = scope.geometriesByType[ type ];
+					return new THREE.Mesh( geometry, material );
+
 				}
 
 			}),
 
-			proxy: Jux.RendererProxy.extend( {
+			adapter: Jux.Adapter.extend( {
 
 				data_set: function( threeObj, data ){
 					threeObj.userData = data;
 				},
 
-				position_set: function( threeObj, x, y ){
+				position_set: function( threeObj, x, y ) {
 					threeObj.position.x = x;
 					threeObj.position.y = -y;
+
+					//threeObj.rotation.x = ( Math.PI / 180 ) * x;
 				},
 
 				size_set: function( threeObj, w, h ){
@@ -165,7 +248,7 @@ ThreeView.prototype = {
 		this.renderer.render( this.scene, this.camera );
 
 		this.camera.position.z = 200;
-		this.camera.position.y = 0;//100;
+		this.camera.position.y = -100;//100;
 		//this.camera.position.x = -200;
 		this.camera.lookAt( this.interactionPlane.position );
 
@@ -178,8 +261,14 @@ ThreeView.prototype = {
 		this.camera.aspect = w/h;
 		this.camera.updateProjectionMatrix();
 
+		w = 60;
+		h = 200;
+
 		//this.view.size( 100,100 );
-		this.view.size( 100,100 );
+		this.view.size( w,h );
+
+		this.container.position.x = -w/2;
+		this.container.position.y = h/2;
 		//this.scroller.setViewSize( w,h );
 
 	},

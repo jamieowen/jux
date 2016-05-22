@@ -1,9 +1,10 @@
-<div id="header">
-    <a id="logo" href="/">
-        <img src="/images/logo.png">
-        <span>Jux</span>
-    </a>
-    <ul id="nav">
-        <%- partial('partials/main_menu') %>
-    </ul>
-</div>
+
+<navigation>
+	<ul>
+		<% site.pages.sort('order').each(function (p) { %>
+		<li>
+			<a href="/<%- p.path %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>"><%- p.title %></a>
+		</li>
+		<% }) %>
+	</ul>
+</navigation>
