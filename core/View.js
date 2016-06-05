@@ -19,6 +19,7 @@ var View = function( layout, config ){
 	this.adapter 	 = config.adapter;
 	this.pool		 = config.pool;
 
+	//console.log( 'CREATE VIEW', this.adapter, this.layout );
 
 	this._viewport	 = new Bounds();
 
@@ -119,6 +120,7 @@ View.prototype = {
 
 			//var lastLength = this.results.length;
 
+			//console.log( 'VIEW RENDER:', rendererAdapter, this.pool );
 			while( this.results.length ){
 
 				layoutItem = this.results.shift();
@@ -129,12 +131,11 @@ View.prototype = {
 				layoutAdapter.size_get( layoutItem, helperSize );
 
 				renderer = this.pool.get( layoutItem );
+
+				// TODO :
+				// Best order and document.. ( set : data, add, position, size )
+				// TODO : don't reset the data again.
 				rendererAdapter.data_set( renderer, data );
-				rendererAdapter.position_set( renderer,
-					helperPoint.x - helperViewport.x - this.margin.left,
-					helperPoint.y - helperViewport.y - this.margin.top
-				);
-				rendererAdapter.size_set( renderer, helperSize.width, helperSize.height );
 
 				// check if the renderer has already been added.
 				// if it has remove it from previousData
@@ -148,7 +149,13 @@ View.prototype = {
 					rendererAdapter.child_add( container, renderer );
 				}
 
-				this.visibleData.push( layoutItem );
+				rendererAdapter.position_set( renderer,
+					helperPoint.x - helperViewport.x - this.margin.left,
+					helperPoint.y - helperViewport.y - this.margin.top
+				);
+				rendererAdapter.size_set( renderer, helperSize.width, helperSize.height );
+
+				this.visibleData.push( layoutItem ); // TODO : and this should be data objects..
 				this.visibleRenderers.push( renderer );
 
 			}

@@ -1,6 +1,5 @@
 
 var Signal 			= require( 'signals' );
-var Bounds 			= require( './bounds/Bounds' );
 var createExtends 	= require( './util/createExtends' );
 var WeakMap			= require( 'weak-map' );
 
@@ -48,23 +47,30 @@ TypedPool.prototype = {
 	},
 
 	create: function( data, type ) {
-		return new Bounds();
+
 	},
 
 	get: function( data ){
 
-		var object = this.map.get( data );
+		// Need to look into best method for Bounds / data.
+		var type = this.getType(data.data);
+		var map = this.byType[type].map;
+		var object = map.get( data );
+
 		if( !object ){
 
-			if( this.pool.length ){
-				object = this.pool.shift();
+			var pool = this.byType[type].pool;
+
+			if( pool.length ){
+				object = pool.shift();
 				this.onRevive.dispatch( object,data );
 			}else{
-				object = this.create(data);
+				object = this.create(data,type);
 				this.onCreate.dispatch( object,data );
 			}
 
-			this.map.set( data, object );
+			map.set( data, object );
+
 		}
 		return object;
 
@@ -72,10 +78,15 @@ TypedPool.prototype = {
 
 	release: function( data ){
 
-		var pooled = this.map.get( data );
+		// Need to look into best method for Bounds / data.
+		var type = this.getType( data.data );
+		var map = this.byType[type].map;
+		var pooled = map.get( data );
+
 		if( pooled ){
-			this.map.delete( data );
-			this.pool.push( pooled );
+			var pool = this.byType[type].pool;
+			map.delete( data );
+			pool.push( pooled );
 			this.onRelease.dispatch( pooled, data );
 			return pooled;
 		}else{
@@ -85,10 +96,17 @@ TypedPool.prototype = {
 
 	clean: function(){
 
-		var len = this.pool.length;
-		if( len > this.maxSize ){
-			this.pool.splice( this.maxSize );
+		var pool,len;
+		for( var key in this.byType ){
+
+			pool = this.byType[key].pool;
+			len = pool.length;
+			if( len > this.maxSize ){
+				pool.splice( this.maxSize );
+			}
+
 		}
+
 	}
 
 };
