@@ -22,7 +22,6 @@
   "homepage": "https://github.com/jamieowen/jux#readme",
   "devDependencies": {
     "budo": "^8.1.0",
-    "object-assign": "^4.0.1",
     "require-dir": "^0.3.0",
     "tape": "^4.5.1"
   },
@@ -30,6 +29,7 @@
     "binary-search-bounds": "^2.0.3",
     "eventemitter3": "^1.2.0",
     "gl-vec2": "^1.0.0",
+    "object-assign": "^4.1.0",
     "signals": "^1.0.0",
     "weak-map": "^1.0.5"
   }
